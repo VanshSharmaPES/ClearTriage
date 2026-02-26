@@ -1,0 +1,28 @@
+{
+  "name": "glass-box-triage",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "npm install --prefix client && npm install --prefix server && cd ml-service && python -m venv venv && venv\\Scripts\\activate.bat && pip install -r requirements.txt",
+    "start:client": "npm run dev --prefix client",
+    "start:server": "node server/index.js",
+    "start:ml": "cd ml-service && venv\\Scripts\\activate.bat && uvicorn main:app --reload",
+    "dev": "concurrently \"npm run start:client\" \"npm run start:server\" \"npm run start:ml\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VanshSharmaPES/ClearTriage.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/VanshSharmaPES/ClearTriage/issues"
+  },
+  "homepage": "https://github.com/VanshSharmaPES/ClearTriage#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
