@@ -1,4 +1,4 @@
-# ⚕ ClearTriage — Glass-Box Intelligent Triage System
+# ClearTriage — Glass-Box Intelligent Triage System
 
 A scalable, **explainable AI (XAI)** hospital triage system built with MERN + Python. Predicts patient urgency (ESI 1–5) using a Random Forest classifier and provides transparent, evidence-based reasoning.
 
