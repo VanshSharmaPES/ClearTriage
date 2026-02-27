@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "postinstall": "npm install --prefix client && npm install --prefix server && cd ml-service && python -m venv venv && venv\\Scripts\\activate.bat && pip install -r requirements.txt",
-    "start:client": "npm run dev --prefix client",
+    "start:client": "npm run dev --prefix client -- -p 3001",
     "start:server": "node server/index.js",
     "start:ml": "cd ml-service && venv\\Scripts\\activate.bat && uvicorn main:app --reload",
     "dev": "concurrently \"npm run start:client\" \"npm run start:server\" \"npm run start:ml\""
