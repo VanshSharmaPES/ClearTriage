@@ -1,0 +1,38 @@
+services:
+  # MongoDB
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  # Node.js Backend
+  server:
+    build: ./server
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/triage-system
+      - PORT=3000
+      - ML_SERVICE_URL=http://ml-service:8000/predict
+    depends_on:
+      - mongo
+      - ml-service
+
+  # Python ML Service
+  ml-service:
+    build: ./ml-service
+    ports:
+      - "8000:8000"
+
+  # Next.js Frontend
+  client:
+    build: ./client
+    ports:
+      - "3001:3001"
+    depends_on:
+      - server
+
+volumes:
+  mongo-data:

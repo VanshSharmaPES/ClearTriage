@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 
 const TRIAGE_COLORS = {
     0: 'var(--triage-0)',
@@ -176,7 +176,7 @@ export default function Dashboard() {
                                         const statusStyle = STATUS_STYLES[p.status] || STATUS_STYLES.Waiting;
                                         const isExpanded = expandedId === p._id;
                                         return (
-                                            <>
+                                            <Fragment key={p._id}>
                                                 <tr key={p._id}
                                                     className="transition-colors duration-150 cursor-pointer"
                                                     style={{ borderBottom: isExpanded ? 'none' : '1px solid var(--border)' }}
@@ -293,7 +293,7 @@ export default function Dashboard() {
                                                         </td>
                                                     </tr>
                                                 )}
-                                            </>
+                                            </Fragment>
                                         );
                                     })}
                                 </tbody>

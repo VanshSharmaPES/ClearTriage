@@ -1,0 +1,10 @@
+data/data.csv
+data/cleaned_data.csv
+data/model.pkl
+data/scaler.pkl
+data/feature_names.pkl
+!data/
+venv/
+__pycache__/
+*.pyc
+.env

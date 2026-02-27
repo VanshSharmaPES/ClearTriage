@@ -39,17 +39,14 @@ router.post('/', async (req, res) => {
             };
 
             const mlResponse = await axios.post(ML_SERVICE_URL, mlPayload, { timeout: 5000 });
-            const { triage_score, triage_label, confidence, probabilities } = mlResponse.data;
+            const { triage_score, triage_label, confidence, probabilities, explanations } = mlResponse.data;
 
-            // 3. Update patient with triage results
+            // 3. Update patient with triage results + SHAP explanations
             patient.triageScore = triage_score;
             patient.status = 'Triaged';
             patient.aiReasoning = [
-                `Triage Level: ESI ${triage_score} (${triage_label})`,
-                `Confidence: ${(confidence * 100).toFixed(1)}%`,
-                ...Object.entries(probabilities).map(
-                    ([k, v]) => `${k}: ${(v * 100).toFixed(1)}%`
-                )
+                `ESI ${triage_score} (${triage_label}) — ${(confidence * 100).toFixed(0)}% confidence`,
+                ...explanations
             ];
             await patient.save();
 
