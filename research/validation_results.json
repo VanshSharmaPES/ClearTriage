@@ -1,0 +1,149 @@
+{
+  "sample_size": 50,
+  "accuracy": 0.48,
+  "macro_recall": 0.48,
+  "confusion_matrix": [
+    [
+      8,
+      2,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      10,
+      0,
+      0,
+      0
+    ],
+    [
+      3,
+      4,
+      0,
+      3,
+      0
+    ],
+    [
+      4,
+      0,
+      0,
+      6,
+      0
+    ],
+    [
+      1,
+      6,
+      0,
+      3,
+      0
+    ]
+  ],
+  "confusion_labels": [
+    "ESI1",
+    "ESI2",
+    "ESI3",
+    "ESI4",
+    "ESI5"
+  ],
+  "total_misclassified": 26,
+  "misclassified_details": [
+    {
+      "index": 5,
+      "doctor_score": 1,
+      "ai_score": 2,
+      "age": 1.1449957268546889,
+      "sex": 1,
+      "hr": -0.1170458878032613,
+      "confidence": 0.44
+    },
+    {
+      "index": 7,
+      "doctor_score": 1,
+      "ai_score": 2,
+      "age": -0.3257977982404669,
+      "sex": 2,
+      "hr": -0.1170458878032613,
+      "confidence": 0.36
+    },
+    {
+      "index": 20,
+      "doctor_score": 3,
+      "ai_score": 1,
+      "age": 1.7028829260287133,
+      "sex": 1,
+      "hr": 0.9733742581285924,
+      "confidence": 0.31
+    },
+    {
+      "index": 21,
+      "doctor_score": 3,
+      "ai_score": 4,
+      "age": 0.0292213285066396,
+      "sex": 1,
+      "hr": -0.7228348577654022,
+      "confidence": 0.35
+    },
+    {
+      "index": 22,
+      "doctor_score": 3,
+      "ai_score": 2,
+      "age": 1.1449957268546889,
+      "sex": 1,
+      "hr": 1.458005434098305,
+      "confidence": 0.32
+    },
+    {
+      "index": 23,
+      "doctor_score": 3,
+      "ai_score": 4,
+      "age": -1.3908551784817866,
+      "sex": 2,
+      "hr": -0.1170458878032613,
+      "confidence": 0.26
+    },
+    {
+      "index": 24,
+      "doctor_score": 3,
+      "ai_score": 2,
+      "age": 0.7392595820008527,
+      "sex": 2,
+      "hr": -1.0863082397426869,
+      "confidence": 0.28
+    },
+    {
+      "index": 25,
+      "doctor_score": 3,
+      "ai_score": 1,
+      "age": -0.0214956896000899,
+      "sex": 1,
+      "hr": -0.2382036817956895,
+      "confidence": 0.29
+    },
+    {
+      "index": 26,
+      "doctor_score": 3,
+      "ai_score": 4,
+      "age": 0.3842404552537461,
+      "sex": 2,
+      "hr": 1.0339531551248065,
+      "confidence": 0.26
+    },
+    {
+      "index": 27,
+      "doctor_score": 3,
+      "ai_score": 1,
+      "age": 1.5000148536017954,
+      "sex": 1,
+      "hr": -0.4199403727843318,
+      "confidence": 0.3
+    }
+  ],
+  "class_distribution": {
+    "ESI_1": 10,
+    "ESI_2": 10,
+    "ESI_3": 10,
+    "ESI_4": 10,
+    "ESI_5": 10
+  }
+}

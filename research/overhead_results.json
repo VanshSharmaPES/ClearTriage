@@ -1,0 +1,29 @@
+{
+  "node-ai": {
+    "label": "node-ai",
+    "count": 50,
+    "avg": 88.85618999999998,
+    "median": 85.5027,
+    "p95": 88.9157,
+    "p99": 245.126,
+    "min": 78.6989,
+    "max": 245.126
+  },
+  "node-only": {
+    "label": "node-only",
+    "count": 50,
+    "avg": 7.043942,
+    "median": 5.419,
+    "p95": 7.4627,
+    "p99": 73.0329,
+    "min": 4.5549,
+    "max": 73.0329
+  },
+  "comparison": {
+    "nodeOnlyAvg": 7.043942,
+    "nodeAiAvg": 88.85618999999998,
+    "aiOverheadMs": 81.81224799999998,
+    "aiOverheadPercent": 1161.4554463963498,
+    "acceptable": true
+  }
+}

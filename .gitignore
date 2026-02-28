@@ -1,2 +1,42 @@
-REQUIREMENTS.md
+# Dependencies
+node_modules/
+
+# Python
+ml-service/venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# Environment
 .env
+.env.local
+
+# ML artifacts (large binary files)
+ml-service/data/model.pkl
+ml-service/data/scaler.pkl
+ml-service/data/feature_names.pkl
+ml-service/data/cleaned_data.csv
+
+# Raw dataset (too large for repo)
+ml-service/data/data.csv
+
+# Next.js
+client/.next/
+client/out/
+
+# Requirements (private)
+REQUIREMENTS.md
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*

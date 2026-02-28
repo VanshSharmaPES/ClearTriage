@@ -1,0 +1,44 @@
+[
+  {
+    "connections": 100,
+    "duration": 30,
+    "totalRequests": 18570,
+    "avgLatency": 161.43,
+    "p50Latency": 157,
+    "p99Latency": 241,
+    "maxLatency": 414,
+    "requestsPerSec": 619,
+    "throughputMBps": "0.36",
+    "errors": 0,
+    "timeouts": 0,
+    "non2xx": 0
+  },
+  {
+    "connections": 500,
+    "duration": 30,
+    "totalRequests": 16314,
+    "avgLatency": 911.52,
+    "p50Latency": 870,
+    "p99Latency": 1269,
+    "maxLatency": 1595,
+    "requestsPerSec": 543.8,
+    "throughputMBps": "0.32",
+    "errors": 0,
+    "timeouts": 0,
+    "non2xx": 0
+  },
+  {
+    "connections": 1000,
+    "duration": 30,
+    "totalRequests": 15754,
+    "avgLatency": 1869.39,
+    "p50Latency": 1855,
+    "p99Latency": 2563,
+    "maxLatency": 2759,
+    "requestsPerSec": 525.14,
+    "throughputMBps": "0.31",
+    "errors": 0,
+    "timeouts": 0,
+    "non2xx": 0
+  }
+]
