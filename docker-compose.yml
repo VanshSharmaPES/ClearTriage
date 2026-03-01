@@ -25,6 +25,18 @@ services:
     build: ./ml-service
     ports:
       - "8000:8000"
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
 
   # Next.js Frontend
   client:
@@ -36,3 +48,4 @@ services:
 
 volumes:
   mongo-data:
+  redis-data:

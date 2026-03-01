@@ -3,11 +3,12 @@ import io
 import os
 import hashlib
 import json
-from collections import OrderedDict
+import logging
 import numpy as np
 import pandas as pd
 import joblib
 import shap
+import redis
 from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Optional
@@ -26,9 +27,20 @@ feature_names = joblib.load(os.path.join(DATA_DIR, 'feature_names.pkl'))
 # ── SHAP Explainer ───────────────────────────────────────
 explainer = shap.TreeExplainer(model)
 
-# ── In-Memory LRU Prediction Cache ───────────────────
-MAX_CACHE_SIZE = 500
-prediction_cache = OrderedDict()
+# ── Redis Prediction Cache ───────────────────────────
+REDIS_URL = os.environ.get("REDIS_URL")
+redis_client = None
+if REDIS_URL:
+    try:
+        redis_client = redis.Redis.from_url(REDIS_URL, decode_responses=True)
+        redis_client.ping()
+        print(f"✅ Redis Cache connected at {REDIS_URL}")
+    except redis.ConnectionError:
+        print(f"⚠️ Redis Connection Failed at {REDIS_URL}, running without cache")
+        redis_client = None
+else:
+    print(f"⚠️ No REDIS_URL provided, running without cache")
+
 cache_stats = {"hits": 0, "misses": 0}
 
 def get_cache_key(data_dict):
@@ -37,21 +49,30 @@ def get_cache_key(data_dict):
     return hashlib.md5(key_data.encode()).hexdigest()
 
 def cache_get(key):
-    if key in prediction_cache:
-        cache_stats["hits"] += 1
-        prediction_cache.move_to_end(key)
-        return prediction_cache[key]
-    cache_stats["misses"] += 1
-    return None
+    if not redis_client:
+        return None
+    try:
+        cached = redis_client.get(key)
+        if cached:
+            cache_stats["hits"] += 1
+            return json.loads(cached)
+        else:
+            cache_stats["misses"] += 1
+            return None
+    except redis.ConnectionError:
+        return None
 
 def cache_set(key, value):
-    prediction_cache[key] = value
-    if len(prediction_cache) > MAX_CACHE_SIZE:
-        prediction_cache.popitem(last=False)
+    if not redis_client:
+        return
+    try:
+        # Cache for 1 hour
+        redis_client.setex(key, 3600, json.dumps(value))
+    except redis.ConnectionError:
+        pass
 
 print(f"✅ Model loaded: {len(feature_names)} features, classes={list(model.classes_)}")
 print(f"✅ SHAP TreeExplainer ready")
-print(f"✅ LRU Cache ready (max {MAX_CACHE_SIZE} entries)")
 
 # Columns that the scaler was fitted on
 VITALS_COLS = ['Age', 'SBP', 'DBP', 'HR', 'RR', 'BT', 'Saturation', 'NRS_pain']
@@ -149,13 +170,26 @@ def read_root():
 def get_cache_stats():
     total = cache_stats["hits"] + cache_stats["misses"]
     rate = (cache_stats["hits"] / total * 100) if total > 0 else 0
+    
+    redis_health = "disconnected"
+    cache_size = 0
+    if redis_client:
+        try:
+            redis_client.ping()
+            redis_health = "connected"
+            cache_size = redis_client.dbsize()
+        except redis.ConnectionError:
+            pass
+
     return {
+        "provider": "redis",
+        "health": redis_health,
         "hits": cache_stats["hits"],
         "misses": cache_stats["misses"],
         "total": total,
         "hit_rate": f"{rate:.1f}%",
-        "cache_size": len(prediction_cache),
-        "max_size": MAX_CACHE_SIZE,
+        "cache_size": cache_size,
+        "ttl_seconds": 3600
     }
 
 

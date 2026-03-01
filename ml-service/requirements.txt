@@ -6,3 +6,4 @@ joblib
 shap
 seaborn
 matplotlib
+redis

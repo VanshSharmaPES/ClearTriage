@@ -10,6 +10,7 @@ import json
 import numpy as np
 import pandas as pd
 import joblib
+import shap
 from sklearn.metrics import (
     accuracy_score, classification_report,
     confusion_matrix, recall_score
@@ -28,8 +29,11 @@ model = joblib.load(os.path.join(DATA_DIR, 'model.pkl'))
 scaler = joblib.load(os.path.join(DATA_DIR, 'scaler.pkl'))
 feature_names = joblib.load(os.path.join(DATA_DIR, 'feature_names.pkl'))
 
+# Initialize SHAP explainer
+explainer = shap.TreeExplainer(model)
+
 print("=" * 60)
-print("🧪 HUMAN vs AI VALIDATION STUDY")
+print("🧪 HUMAN vs AI VALIDATION STUDY & SHAP AUDIT")
 print("=" * 60)
 
 # Load full cleaned data
@@ -107,20 +111,40 @@ print(f"{'=' * 60}")
 
 misclass_details = []
 for idx in mismatches[:10]:  # Show first 10
-    row = sample.iloc[idx]
+    row_raw = sample.iloc[idx]
+    row_scaled = X_sample.iloc[[idx]]
+    
+    # SHAP Audit
+    pred_class = y_pred[idx]
+    class_idx = list(model.classes_).index(pred_class)
+    
+    sv = explainer.shap_values(row_scaled)
+    if isinstance(sv, np.ndarray) and sv.ndim == 3:
+        shap_vals = sv[0, :, class_idx]
+    elif isinstance(sv, list):
+        shap_vals = sv[class_idx][0]
+    else:
+        shap_vals = sv[0]
+        
+    feature_impacts = [(feature_names[i], float(shap_vals[i])) for i in range(len(feature_names))]
+    feature_impacts.sort(key=lambda x: abs(x[1]), reverse=True)
+    top_features = [{"feature": f, "impact": round(v, 4)} for f, v in feature_impacts[:3]]
+
     detail = {
         'index': int(idx),
         'doctor_score': int(y_true[idx]),
         'ai_score': int(y_pred[idx]),
-        'age': float(row.get('Age', 0)),
-        'sex': int(row.get('Sex', 0)),
-        'hr': float(row.get('HR', 0)),
+        'age': float(row_raw.get('Age', 0)),
+        'sex': int(row_raw.get('Sex', 0)),
+        'hr': float(row_raw.get('HR', 0)),
         'confidence': float(max(y_proba[idx])),
+        'shap_top_features': top_features
     }
     misclass_details.append(detail)
     direction = "↑ Over-triaged" if y_pred[idx] < y_true[idx] else "↓ Under-triaged"
     print(f"  Case {idx}: Doctor=ESI {y_true[idx]}, AI=ESI {y_pred[idx]} ({direction}) "
           f"| Age={detail['age']:.0f}, HR={detail['hr']:.0f}, Conf={detail['confidence']:.1%}")
+    print(f"       ↳ AI focused on: {', '.join([f['feature'] for f in top_features])}")
 
 # ── Save results ─────────────────────────────────────
 results = {
@@ -139,5 +163,10 @@ out_path = os.path.join(OUT_DIR, 'validation_results.json')
 with open(out_path, 'w') as f:
     json.dump(results, f, indent=2)
 
+audit_path = os.path.join(OUT_DIR, 'explainability_audit.json')
+with open(audit_path, 'w') as f:
+    json.dump(misclass_details, f, indent=2)
+
 print(f"\n💾 Results saved to {out_path}")
+print(f"💾 Audit saved to {audit_path}")
 print(f"{'=' * 60}")

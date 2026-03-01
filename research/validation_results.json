@@ -55,7 +55,21 @@
       "age": 1.1449957268546889,
       "sex": 1,
       "hr": -0.1170458878032613,
-      "confidence": 0.44
+      "confidence": 0.44,
+      "shap_top_features": [
+        {
+          "feature": "Arrival mode",
+          "impact": 0.0779
+        },
+        {
+          "feature": "Mental",
+          "impact": 0.072
+        },
+        {
+          "feature": "Patients number per hour",
+          "impact": 0.0325
+        }
+      ]
     },
     {
       "index": 7,
@@ -64,7 +78,21 @@
       "age": -0.3257977982404669,
       "sex": 2,
       "hr": -0.1170458878032613,
-      "confidence": 0.36
+      "confidence": 0.36,
+      "shap_top_features": [
+        {
+          "feature": "complaint_other",
+          "impact": 0.058
+        },
+        {
+          "feature": "Sex",
+          "impact": 0.0362
+        },
+        {
+          "feature": "HR",
+          "impact": 0.0355
+        }
+      ]
     },
     {
       "index": 20,
@@ -73,7 +101,21 @@
       "age": 1.7028829260287133,
       "sex": 1,
       "hr": 0.9733742581285924,
-      "confidence": 0.31
+      "confidence": 0.31,
+      "shap_top_features": [
+        {
+          "feature": "SBP",
+          "impact": 0.1232
+        },
+        {
+          "feature": "Mental",
+          "impact": -0.0681
+        },
+        {
+          "feature": "Saturation",
+          "impact": 0.0562
+        }
+      ]
     },
     {
       "index": 21,
@@ -82,7 +124,21 @@
       "age": 0.0292213285066396,
       "sex": 1,
       "hr": -0.7228348577654022,
-      "confidence": 0.35
+      "confidence": 0.35,
+      "shap_top_features": [
+        {
+          "feature": "NRS_pain",
+          "impact": 0.0917
+        },
+        {
+          "feature": "Age",
+          "impact": 0.0709
+        },
+        {
+          "feature": "SBP",
+          "impact": -0.0564
+        }
+      ]
     },
     {
       "index": 22,
@@ -91,7 +147,21 @@
       "age": 1.1449957268546889,
       "sex": 1,
       "hr": 1.458005434098305,
-      "confidence": 0.32
+      "confidence": 0.32,
+      "shap_top_features": [
+        {
+          "feature": "complaint_other",
+          "impact": 0.0541
+        },
+        {
+          "feature": "Age",
+          "impact": -0.0352
+        },
+        {
+          "feature": "complaint_dyspnea",
+          "impact": 0.0296
+        }
+      ]
     },
     {
       "index": 23,
@@ -100,7 +170,21 @@
       "age": -1.3908551784817866,
       "sex": 2,
       "hr": -0.1170458878032613,
-      "confidence": 0.26
+      "confidence": 0.26,
+      "shap_top_features": [
+        {
+          "feature": "Age",
+          "impact": 0.0701
+        },
+        {
+          "feature": "Saturation",
+          "impact": -0.0578
+        },
+        {
+          "feature": "SBP",
+          "impact": -0.0524
+        }
+      ]
     },
     {
       "index": 24,
@@ -109,7 +193,21 @@
       "age": 0.7392595820008527,
       "sex": 2,
       "hr": -1.0863082397426869,
-      "confidence": 0.28
+      "confidence": 0.28,
+      "shap_top_features": [
+        {
+          "feature": "Sex",
+          "impact": 0.0377
+        },
+        {
+          "feature": "SBP",
+          "impact": 0.0367
+        },
+        {
+          "feature": "DBP",
+          "impact": 0.0365
+        }
+      ]
     },
     {
       "index": 25,
@@ -118,7 +216,21 @@
       "age": -0.0214956896000899,
       "sex": 1,
       "hr": -0.2382036817956895,
-      "confidence": 0.29
+      "confidence": 0.29,
+      "shap_top_features": [
+        {
+          "feature": "SBP",
+          "impact": 0.1124
+        },
+        {
+          "feature": "Saturation",
+          "impact": 0.0713
+        },
+        {
+          "feature": "Mental",
+          "impact": -0.069
+        }
+      ]
     },
     {
       "index": 26,
@@ -127,7 +239,21 @@
       "age": 0.3842404552537461,
       "sex": 2,
       "hr": 1.0339531551248065,
-      "confidence": 0.26
+      "confidence": 0.26,
+      "shap_top_features": [
+        {
+          "feature": "Age",
+          "impact": 0.0701
+        },
+        {
+          "feature": "Saturation",
+          "impact": -0.0577
+        },
+        {
+          "feature": "SBP",
+          "impact": -0.0519
+        }
+      ]
     },
     {
       "index": 27,
@@ -136,7 +262,21 @@
       "age": 1.5000148536017954,
       "sex": 1,
       "hr": -0.4199403727843318,
-      "confidence": 0.3
+      "confidence": 0.3,
+      "shap_top_features": [
+        {
+          "feature": "SBP",
+          "impact": 0.1226
+        },
+        {
+          "feature": "Mental",
+          "impact": -0.068
+        },
+        {
+          "feature": "Saturation",
+          "impact": 0.0562
+        }
+      ]
     }
   ],
   "class_distribution": {
