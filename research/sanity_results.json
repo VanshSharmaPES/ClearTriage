@@ -1,0 +1,74 @@
+{
+  "total": 6,
+  "passed": 6,
+  "failed": 0,
+  "pass_rate": "100%",
+  "tests": [
+    {
+      "name": "Critical Cardiac",
+      "description": "HR=150, Temp=104\u00b0F (40\u00b0C), BP 80/50, O\u2082=85 \u2192 should be ESI 1-2",
+      "predicted": 2,
+      "confidence": 0.51,
+      "expected_range": [
+        1,
+        2
+      ],
+      "passed": true
+    },
+    {
+      "name": "Moderate Respiratory",
+      "description": "HR=100, Temp=101\u00b0F (38.3\u00b0C), BP 130/85, O\u2082=93 \u2192 should be ESI 2-3",
+      "predicted": 3,
+      "confidence": 0.48,
+      "expected_range": [
+        2,
+        3
+      ],
+      "passed": true
+    },
+    {
+      "name": "Mild Stable",
+      "description": "HR=72, Temp=98.6\u00b0F (36.5\u00b0C), normal BP, O\u2082=99 \u2192 should be ESI 4-5",
+      "predicted": 4,
+      "confidence": 0.67,
+      "expected_range": [
+        3,
+        5
+      ],
+      "passed": true
+    },
+    {
+      "name": "Elderly Critical",
+      "description": "Age=85, HR=40 (bradycardia), Temp=95\u00b0F (35\u00b0C), O\u2082=82 \u2192 should be ESI 1-2",
+      "predicted": 2,
+      "confidence": 0.49,
+      "expected_range": [
+        1,
+        2
+      ],
+      "passed": true
+    },
+    {
+      "name": "Young Healthy",
+      "description": "Age=20, all vitals normal \u2192 should be ESI 4-5",
+      "predicted": 4,
+      "confidence": 0.49,
+      "expected_range": [
+        3,
+        5
+      ],
+      "passed": true
+    },
+    {
+      "name": "Edge: Minimal Input",
+      "description": "Only age and sex, rest defaults \u2192 should not crash",
+      "predicted": 4,
+      "confidence": 0.47,
+      "expected_range": [
+        1,
+        5
+      ],
+      "passed": true
+    }
+  ]
+}

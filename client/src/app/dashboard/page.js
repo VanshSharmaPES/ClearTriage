@@ -220,11 +220,33 @@ export default function Dashboard() {
                                                         {p.vitals?.o2Sat ?? '—'}%
                                                     </td>
                                                     <td className="px-4 py-3">
-                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
-                                                            style={{ background: `${triageColor}20`, color: triageColor }}>
-                                                            <span className="w-1.5 h-1.5 rounded-full" style={{ background: triageColor }} />
-                                                            ESI {p.triageScore} — {TRIAGE_LABELS[p.triageScore] || 'Unknown'}
-                                                        </span>
+                                                        <div className="triage-tooltip-wrapper" style={{ position: 'relative', display: 'inline-block' }}>
+                                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold cursor-help"
+                                                                style={{ background: `${triageColor}20`, color: triageColor }}>
+                                                                <span className="w-1.5 h-1.5 rounded-full" style={{ background: triageColor }} />
+                                                                ESI {p.triageScore} — {TRIAGE_LABELS[p.triageScore] || 'Unknown'}
+                                                            </span>
+                                                            {p.whyText && (
+                                                                <div className="triage-tooltip"
+                                                                    style={{
+                                                                        position: 'absolute', bottom: '100%', left: '50%',
+                                                                        transform: 'translateX(-50%)', marginBottom: '8px',
+                                                                        background: 'var(--surface-3)', color: 'var(--text-primary)',
+                                                                        padding: '8px 12px', borderRadius: '8px',
+                                                                        fontSize: '11px', whiteSpace: 'nowrap',
+                                                                        boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
+                                                                        border: `1px solid ${triageColor}40`,
+                                                                        pointerEvents: 'none', opacity: 0,
+                                                                        transition: 'opacity 0.2s',
+                                                                        zIndex: 50,
+                                                                    }}>
+                                                                    <div style={{ fontWeight: 600, marginBottom: '2px', color: triageColor }}>
+                                                                        Why?
+                                                                    </div>
+                                                                    {p.whyText}
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     </td>
                                                     <td className="px-4 py-3">
                                                         <span className="px-2.5 py-1 rounded-full text-xs font-medium"

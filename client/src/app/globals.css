@@ -5,12 +5,18 @@
   --color-foreground: #ededed;
 
   /* Triage ESI Colors */
-  --triage-1: #ef4444; /* Immediate - Red */
-  --triage-2: #f97316; /* Emergent - Orange */
-  --triage-3: #eab308; /* Urgent - Yellow */
-  --triage-4: #22c55e; /* Less Urgent - Green */
-  --triage-5: #3b82f6; /* Non-Urgent - Blue */
-  --triage-0: #6b7280; /* Unassigned - Gray */
+  --triage-1: #ef4444;
+  /* Immediate - Red */
+  --triage-2: #f97316;
+  /* Emergent - Orange */
+  --triage-3: #eab308;
+  /* Urgent - Yellow */
+  --triage-4: #22c55e;
+  /* Less Urgent - Green */
+  --triage-5: #3b82f6;
+  /* Non-Urgent - Blue */
+  --triage-0: #6b7280;
+  /* Unassigned - Gray */
 
   /* Accent */
   --accent: #6366f1;
@@ -44,13 +50,21 @@ body {
 ::-webkit-scrollbar {
   width: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: var(--surface-1);
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 3px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--border-hover);
+}
+
+/* "Why?" Hover Tooltip on Triage Badge */
+.triage-tooltip-wrapper:hover .triage-tooltip {
+  opacity: 1 !important;
 }

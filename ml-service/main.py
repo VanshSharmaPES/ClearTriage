@@ -1,6 +1,9 @@
 import sys
 import io
 import os
+import hashlib
+import json
+from collections import OrderedDict
 import numpy as np
 import pandas as pd
 import joblib
@@ -22,8 +25,33 @@ feature_names = joblib.load(os.path.join(DATA_DIR, 'feature_names.pkl'))
 
 # ── SHAP Explainer ───────────────────────────────────────
 explainer = shap.TreeExplainer(model)
+
+# ── In-Memory LRU Prediction Cache ───────────────────
+MAX_CACHE_SIZE = 500
+prediction_cache = OrderedDict()
+cache_stats = {"hits": 0, "misses": 0}
+
+def get_cache_key(data_dict):
+    """Generate hash key from patient vitals."""
+    key_data = json.dumps(data_dict, sort_keys=True)
+    return hashlib.md5(key_data.encode()).hexdigest()
+
+def cache_get(key):
+    if key in prediction_cache:
+        cache_stats["hits"] += 1
+        prediction_cache.move_to_end(key)
+        return prediction_cache[key]
+    cache_stats["misses"] += 1
+    return None
+
+def cache_set(key, value):
+    prediction_cache[key] = value
+    if len(prediction_cache) > MAX_CACHE_SIZE:
+        prediction_cache.popitem(last=False)
+
 print(f"✅ Model loaded: {len(feature_names)} features, classes={list(model.classes_)}")
 print(f"✅ SHAP TreeExplainer ready")
+print(f"✅ LRU Cache ready (max {MAX_CACHE_SIZE} entries)")
 
 # Columns that the scaler was fitted on
 VITALS_COLS = ['Age', 'SBP', 'DBP', 'HR', 'RR', 'BT', 'Saturation', 'NRS_pain']
@@ -114,7 +142,48 @@ def get_shap_explanations(input_df, predicted_class):
 
 @app.get("/")
 def read_root():
-    return {"message": "ML Service is running", "model": "RandomForest", "features": len(feature_names), "shap": True}
+    return {"message": "ML Service is running", "model": "RandomForest", "features": len(feature_names), "shap": True, "cache": True}
+
+
+@app.get("/cache-stats")
+def get_cache_stats():
+    total = cache_stats["hits"] + cache_stats["misses"]
+    rate = (cache_stats["hits"] / total * 100) if total > 0 else 0
+    return {
+        "hits": cache_stats["hits"],
+        "misses": cache_stats["misses"],
+        "total": total,
+        "hit_rate": f"{rate:.1f}%",
+        "cache_size": len(prediction_cache),
+        "max_size": MAX_CACHE_SIZE,
+    }
+
+
+def build_why_short(data, explanations):
+    """Build compact 'Why?' string using raw (unscaled) vitals."""
+    # Map features to raw input values for human readability
+    raw_values = {
+        'Heart Rate': f"{data.heart_rate:.0f}bpm",
+        'Body Temperature': f"{data.temp:.1f}°",
+        'O₂ Saturation': f"{data.o2_sat:.0f}%",
+        'Systolic BP': f"{data.bp_systolic:.0f}mmHg",
+        'Diastolic BP': f"{data.bp_diastolic:.0f}mmHg",
+        'Respiratory Rate': f"{data.respiratory_rate:.0f}/min",
+        'Pain Score': f"{data.pain_score}/10",
+        'Age': f"{data.age}y",
+    }
+
+    parts = []
+    for exp in explanations[:3]:
+        feat = exp["feature"]
+        val = raw_values.get(feat, "")
+        qualifier = "High" if exp["direction"] == "increased" else "Low"
+        if val:
+            parts.append(f"{qualifier} {feat} ({val})")
+        else:
+            parts.append(f"{qualifier} {feat}")
+
+    return ", ".join(parts) if parts else "Insufficient data"
 
 
 @app.post("/predict")
@@ -137,6 +206,12 @@ def predict(data: PatientInput):
         'BT': data.temp,
         'Saturation': data.o2_sat,
     }
+
+    # Check LRU cache
+    cache_key = get_cache_key(row)
+    cached = cache_get(cache_key)
+    if cached:
+        return cached
 
     # Add complaint dummy columns
     complaint = data.chief_complaint.strip().lower() if data.chief_complaint else 'other'
@@ -165,9 +240,12 @@ def predict(data: PatientInput):
     # SHAP explanations
     explanations = get_shap_explanations(input_df, prediction[0])
 
+    # Compact "Why?" text using raw vitals
+    why_short = build_why_short(data, explanations)
+
     labels = {1: 'Immediate', 2: 'Emergent', 3: 'Urgent', 4: 'Less Urgent', 5: 'Non-Urgent'}
 
-    return {
+    result = {
         "triage_score": triage_score,
         "triage_label": labels.get(triage_score, "Unknown"),
         "confidence": round(confidence, 3),
@@ -176,5 +254,13 @@ def predict(data: PatientInput):
             for i, p in zip(model.classes_, probabilities)
         },
         "explanations": [e["text"] for e in explanations],
-        "shap_details": explanations
+        "why_short": why_short,
+        "shap_details": explanations,
+        "cached": False,
     }
+
+    # Store in cache
+    result_cached = {**result, "cached": True}
+    cache_set(cache_key, result_cached)
+
+    return result
