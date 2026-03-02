@@ -23,6 +23,8 @@ router.post('/', async (req, res) => {
         const patient = new Patient({ ...req.body, status: 'Processing' });
         await patient.save();
 
+        req.app.get('io').emit('patientAdded', patient);
+
         // 2. Call ML service for triage prediction
         try {
             const mlPayload = {
@@ -40,7 +42,7 @@ router.post('/', async (req, res) => {
             };
 
             const mlResponse = await axios.post(ML_SERVICE_URL, mlPayload, { timeout: 5000 });
-            const { triage_score, triage_label, confidence, probabilities, explanations, why_short } = mlResponse.data;
+            const { triage_score, triage_label, confidence, probabilities, explanations, why_short, shap_details } = mlResponse.data;
 
             // 3. Update patient with triage results + SHAP explanations
             patient.triageScore = triage_score;
@@ -50,7 +52,9 @@ router.post('/', async (req, res) => {
                 `ESI ${triage_score} (${triage_label}) — ${(confidence * 100).toFixed(0)}% confidence`,
                 ...explanations
             ];
+            patient.shapDetails = shap_details || [];
             await patient.save();
+            req.app.get('io').emit('patientUpdated', patient);
 
             console.log(`✅ Triaged: ${patient.name} → ESI ${triage_score} (${triage_label}, ${(confidence * 100).toFixed(0)}%)`);
         } catch (mlErr) {
@@ -58,6 +62,7 @@ router.post('/', async (req, res) => {
             patient.status = 'Waiting';
             patient.aiReasoning = ['ML service unavailable — manual triage required'];
             await patient.save();
+            req.app.get('io').emit('patientUpdated', patient);
             console.log(`⚠ ML unavailable for ${patient.name}: ${mlErr.message}`);
         }
 
@@ -87,6 +92,7 @@ router.put('/:id', async (req, res) => {
             { new: true, runValidators: true }
         );
         if (!patient) return res.status(404).json({ error: 'Patient not found' });
+        req.app.get('io').emit('patientUpdated', patient);
         res.json(patient);
     } catch (err) {
         res.status(400).json({ error: err.message });
@@ -98,9 +104,27 @@ router.delete('/:id', async (req, res) => {
     try {
         const patient = await Patient.findByIdAndDelete(req.params.id);
         if (!patient) return res.status(404).json({ error: 'Patient not found' });
+        req.app.get('io').emit('patientDeleted', req.params.id);
         res.json({ message: 'Patient deleted' });
     } catch (err) {
         res.status(500).json({ error: err.message });
+    }
+});
+
+// PATCH /api/patients/:id/override — manual human override
+router.patch('/:id/override', async (req, res) => {
+    try {
+        const { overrideScore, overrideReason } = req.body;
+        const patient = await Patient.findByIdAndUpdate(
+            req.params.id,
+            { overrideScore, overrideReason },
+            { new: true }
+        );
+        if (!patient) return res.status(404).json({ error: 'Patient not found' });
+        req.app.get('io').emit('patientUpdated', patient);
+        res.json(patient);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
     }
 });
 

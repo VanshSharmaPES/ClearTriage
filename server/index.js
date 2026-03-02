@@ -8,7 +8,21 @@ require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
 const patientRoutes = require('./routes/patients');
 
+const { Server } = require('socket.io');
+const http = require('http');
+
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE']
+  }
+});
+
+// Attach io to app so routes can use it
+app.set('io', io);
+
 const port = process.env.PORT || 3000;
 
 app.use(cors());
@@ -29,6 +43,14 @@ app.get('/', (req, res) => {
 
 app.use('/api/patients', patientRoutes);
 
-app.listen(port, () => {
+// Socket.io connection logging
+io.on('connection', (socket) => {
+  console.log(`🔌 Client connected via WebSocket: ${socket.id}`);
+  socket.on('disconnect', () => {
+    console.log(`🔌 Client disconnected: ${socket.id}`);
+  });
+});
+
+server.listen(port, () => {
   console.log(`🚀 Server listening on port ${port}`);
 });

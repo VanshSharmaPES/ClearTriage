@@ -1,6 +1,8 @@
 'use client';
 
 import { Fragment, useEffect, useState } from 'react';
+import { io } from 'socket.io-client';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid } from 'recharts';
 
 const TRIAGE_COLORS = {
     0: 'var(--triage-0)',
@@ -33,6 +35,7 @@ export default function Dashboard() {
     const [error, setError] = useState(null);
     const [lastUpdated, setLastUpdated] = useState(null);
     const [expandedId, setExpandedId] = useState(null);
+    const [overrideModal, setOverrideModal] = useState({ isOpen: false, patientId: null, score: 1, reason: '' });
 
     const fetchPatients = async () => {
         try {
@@ -51,8 +54,22 @@ export default function Dashboard() {
 
     useEffect(() => {
         fetchPatients();
-        const interval = setInterval(fetchPatients, 5000);
-        return () => clearInterval(interval);
+
+        // Connect to Socket.IO server for real-time updates
+        // Uses the same host/port if not specified, but in development our backend is on port 3000
+        const socket = io('http://localhost:3000');
+
+        socket.on('connect', () => {
+            console.log('✅ Connected to real-time server');
+        });
+
+        socket.on('patientAdded', () => fetchPatients());
+        socket.on('patientUpdated', () => fetchPatients());
+        socket.on('patientDeleted', () => fetchPatients());
+
+        return () => {
+            socket.disconnect();
+        };
     }, []);
 
     const handleDelete = async (id) => {
@@ -71,6 +88,23 @@ export default function Dashboard() {
             day: '2-digit', month: 'short', year: 'numeric',
             hour: '2-digit', minute: '2-digit',
         });
+    };
+
+    const submitOverride = async () => {
+        try {
+            await fetch(`/api/patients/${overrideModal.patientId}/override`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    overrideScore: Number(overrideModal.score),
+                    overrideReason: overrideModal.reason
+                })
+            });
+            setOverrideModal({ isOpen: false, patientId: null, score: 1, reason: '' });
+            // State updates automatically via Socket.io
+        } catch (err) {
+            alert('Failed to override triage');
+        }
     };
 
     // Count by triage level
@@ -172,7 +206,8 @@ export default function Dashboard() {
                                 </thead>
                                 <tbody>
                                     {patients.map((p) => {
-                                        const triageColor = TRIAGE_COLORS[p.triageScore] || TRIAGE_COLORS[0];
+                                        const displayScore = p.overrideScore || p.triageScore;
+                                        const triageColor = TRIAGE_COLORS[displayScore] || TRIAGE_COLORS[0];
                                         const statusStyle = STATUS_STYLES[p.status] || STATUS_STYLES.Waiting;
                                         const isExpanded = expandedId === p._id;
                                         return (
@@ -224,7 +259,7 @@ export default function Dashboard() {
                                                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold cursor-help"
                                                                 style={{ background: `${triageColor}20`, color: triageColor }}>
                                                                 <span className="w-1.5 h-1.5 rounded-full" style={{ background: triageColor }} />
-                                                                ESI {p.triageScore} — {TRIAGE_LABELS[p.triageScore] || 'Unknown'}
+                                                                ESI {displayScore} {p.overrideScore ? '🧑‍⚕️' : ''} — {TRIAGE_LABELS[displayScore] || 'Unknown'}
                                                             </span>
                                                             {p.whyText && (
                                                                 <div className="triage-tooltip"
@@ -275,11 +310,44 @@ export default function Dashboard() {
                                                             <div className="flex gap-8">
                                                                 {/* AI Reasoning */}
                                                                 <div className="flex-1">
-                                                                    <h4 className="text-xs font-semibold uppercase tracking-wider mb-2"
-                                                                        style={{ color: 'var(--accent)' }}>
-                                                                        AI Reasoning
-                                                                    </h4>
-                                                                    {p.aiReasoning?.length > 0 ? (
+                                                                    <div className="flex justify-between items-center mb-2">
+                                                                        <h4 className="text-xs font-semibold uppercase tracking-wider"
+                                                                            style={{ color: 'var(--accent)' }}>
+                                                                            AI Reasoning (SHAP Feature Impact)
+                                                                        </h4>
+                                                                        <button
+                                                                            onClick={() => setOverrideModal({ isOpen: true, patientId: p._id, score: p.triageScore || 1, reason: p.overrideReason || '' })}
+                                                                            className="px-3 py-1 text-[11px] font-medium rounded-md transition-colors cursor-pointer"
+                                                                            style={{ background: 'var(--surface-3)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}
+                                                                        >
+                                                                            🧑‍⚕️ Override Score
+                                                                        </button>
+                                                                    </div>
+                                                                    {p.shapDetails?.length > 0 ? (
+                                                                        <div style={{ width: '100%', height: 160 }}>
+                                                                            <ResponsiveContainer width="100%" height="100%">
+                                                                                <BarChart
+                                                                                    data={p.shapDetails}
+                                                                                    layout="vertical"
+                                                                                    margin={{ top: 0, right: 20, left: 120, bottom: 0 }}
+                                                                                >
+                                                                                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" opacity={0.5} />
+                                                                                    <XAxis type="number" hide />
+                                                                                    <YAxis dataKey="feature" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: 'var(--text-secondary)' }} width={120} />
+                                                                                    <Tooltip
+                                                                                        cursor={{ fill: 'var(--surface-3)', opacity: 0.4 }}
+                                                                                        contentStyle={{ background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '12px' }}
+                                                                                        formatter={(value, name, props) => [`${props.payload.text}`, 'Impact']}
+                                                                                    />
+                                                                                    <Bar dataKey="impact" radius={[0, 4, 4, 0]} barSize={20}>
+                                                                                        {p.shapDetails.map((entry, index) => (
+                                                                                            <Cell key={`cell-${index}`} fill={entry.impact > 0 ? '#ef4444' : '#22c55e'} opacity={0.8} />
+                                                                                        ))}
+                                                                                    </Bar>
+                                                                                </BarChart>
+                                                                            </ResponsiveContainer>
+                                                                        </div>
+                                                                    ) : p.aiReasoning?.length > 0 ? (
                                                                         <ul className="space-y-1">
                                                                             {p.aiReasoning.map((r, i) => (
                                                                                 <li key={i} className="text-xs"
@@ -292,6 +360,13 @@ export default function Dashboard() {
                                                                         <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
                                                                             No AI reasoning available
                                                                         </p>
+                                                                    )}
+
+                                                                    {p.overrideScore && (
+                                                                        <div className="mt-4 p-3 rounded-lg text-xs" style={{ background: 'rgba(234, 179, 8, 0.1)', border: '1px solid rgba(234, 179, 8, 0.2)' }}>
+                                                                            <strong style={{ color: '#eab308' }}>🧑‍⚕️ Human Override (ESI {p.overrideScore}): </strong>
+                                                                            <span style={{ color: 'var(--text-secondary)' }}>{p.overrideReason}</span>
+                                                                        </div>
                                                                     )}
                                                                 </div>
                                                                 {/* Vitals detail */}
@@ -324,6 +399,53 @@ export default function Dashboard() {
                     </div>
                 )}
             </div>
+
+            {/* Override Modal */}
+            {overrideModal.isOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div className="p-6 rounded-xl shadow-2xl w-[400px]" style={{ background: 'var(--surface-1)', border: '1px solid var(--border)' }}>
+                        <h3 className="text-lg font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Override AI Triage</h3>
+                        <div className="mb-4">
+                            <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>New ESI Score (1-5)</label>
+                            <select
+                                value={overrideModal.score}
+                                onChange={(e) => setOverrideModal({ ...overrideModal, score: Number(e.target.value) })}
+                                className="w-full rounded p-2 text-sm outline-none"
+                                style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+                            >
+                                {[1, 2, 3, 4, 5].map(s => <option key={s} value={s}>ESI {s} - {TRIAGE_LABELS[s]}</option>)}
+                            </select>
+                        </div>
+                        <div className="mb-4">
+                            <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>Reason for Override</label>
+                            <textarea
+                                value={overrideModal.reason}
+                                onChange={(e) => setOverrideModal({ ...overrideModal, reason: e.target.value })}
+                                placeholder="e.g. AI missed critical context from history..."
+                                className="w-full rounded p-2 text-sm outline-none resize-none h-24"
+                                style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+                            />
+                        </div>
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={() => setOverrideModal({ isOpen: false, patientId: null, score: 1, reason: '' })}
+                                className="px-4 py-2 text-sm font-medium transition-colors cursor-pointer"
+                                style={{ color: 'var(--text-secondary)' }}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={submitOverride}
+                                disabled={!overrideModal.reason.trim()}
+                                className="px-4 py-2 text-sm font-medium rounded transition-colors cursor-pointer disabled:opacity-50"
+                                style={{ background: 'var(--accent)', color: '#fff' }}
+                            >
+                                Submit Override
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

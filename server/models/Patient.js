@@ -14,7 +14,10 @@ const PatientSchema = new mongoose.Schema({
     },
     triageScore: { type: Number, default: 0 },
     aiReasoning: [String],
+    shapDetails: { type: Array, default: [] },
     whyText: { type: String, default: '' },
+    overrideScore: { type: Number, default: null },
+    overrideReason: { type: String, default: null },
     status: { type: String, default: 'Waiting' },
     entryTime: { type: Date, default: Date.now }
 });
