@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../context/AuthContext';
 
 const COMMON_SYMPTOMS = [
     'Chest Pain', 'Shortness of Breath', 'Fever', 'Nausea',
@@ -11,6 +12,7 @@ const COMMON_SYMPTOMS = [
 
 export default function AdmitPatient() {
     const router = useRouter();
+    const { user, token, loading: authLoading } = useAuth();
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState(null);
     const [customSymptom, setCustomSymptom] = useState('');
@@ -28,6 +30,13 @@ export default function AdmitPatient() {
             o2Sat: '',
         },
     });
+
+    // Redirect to login if not authenticated
+    useEffect(() => {
+        if (!authLoading && !user) {
+            router.push('/login');
+        }
+    }, [authLoading, user, router]);
 
     const updateField = (field, value) => {
         setForm((prev) => ({ ...prev, [field]: value }));
@@ -88,9 +97,17 @@ export default function AdmitPatient() {
 
             const res = await fetch('/api/patients', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                },
                 body: JSON.stringify(payload),
             });
+
+            if (res.status === 401) {
+                router.push('/login');
+                return;
+            }
 
             if (!res.ok) {
                 const data = await res.json();
@@ -115,6 +132,9 @@ export default function AdmitPatient() {
     const labelStyle = {
         color: 'var(--text-secondary)',
     };
+
+    if (authLoading) return null;
+    if (!user) return null;
 
     return (
         <div className="min-h-screen px-6 py-8">

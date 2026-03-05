@@ -3,6 +3,8 @@
 import { Fragment, useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid } from 'recharts';
+import { useAuth } from '../context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 const TRIAGE_COLORS = {
     0: 'var(--triage-0)',
@@ -30,6 +32,8 @@ const STATUS_STYLES = {
 };
 
 export default function Dashboard() {
+    const { user, token, loading: authLoading } = useAuth();
+    const router = useRouter();
     const [patients, setPatients] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -37,9 +41,23 @@ export default function Dashboard() {
     const [expandedId, setExpandedId] = useState(null);
     const [overrideModal, setOverrideModal] = useState({ isOpen: false, patientId: null, score: 1, reason: '' });
 
+    // Redirect to login if not authenticated
+    useEffect(() => {
+        if (!authLoading && !user) {
+            router.push('/login');
+        }
+    }, [authLoading, user, router]);
+
+    const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
+
     const fetchPatients = async () => {
+        if (!token) return;
         try {
-            const res = await fetch('/api/patients');
+            const res = await fetch('/api/patients', { headers: authHeaders });
+            if (res.status === 401) {
+                router.push('/login');
+                return;
+            }
             if (!res.ok) throw new Error('Failed to fetch patients');
             const data = await res.json();
             setPatients(data);
@@ -53,10 +71,9 @@ export default function Dashboard() {
     };
 
     useEffect(() => {
+        if (!token) return;
         fetchPatients();
 
-        // Connect to Socket.IO server for real-time updates
-        // Uses the same host/port if not specified, but in development our backend is on port 3000
         const socket = io('http://localhost:3000');
 
         socket.on('connect', () => {
@@ -70,12 +87,16 @@ export default function Dashboard() {
         return () => {
             socket.disconnect();
         };
-    }, []);
+    }, [token]);
 
     const handleDelete = async (id) => {
         if (!confirm('Delete this patient record?')) return;
         try {
-            await fetch(`/api/patients/${id}`, { method: 'DELETE' });
+            const res = await fetch(`/api/patients/${id}`, { method: 'DELETE', headers: authHeaders });
+            if (res.status === 403) {
+                alert('Access denied. Only Admins can delete patients.');
+                return;
+            }
             fetchPatients();
         } catch (err) {
             alert('Failed to delete patient');
@@ -92,24 +113,33 @@ export default function Dashboard() {
 
     const submitOverride = async () => {
         try {
-            await fetch(`/api/patients/${overrideModal.patientId}/override`, {
+            const res = await fetch(`/api/patients/${overrideModal.patientId}/override`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', ...authHeaders },
                 body: JSON.stringify({
                     overrideScore: Number(overrideModal.score),
                     overrideReason: overrideModal.reason
                 })
             });
+            if (res.status === 403) {
+                alert('Access denied. Only Doctors and Admins can override triage scores.');
+                return;
+            }
             setOverrideModal({ isOpen: false, patientId: null, score: 1, reason: '' });
-            // State updates automatically via Socket.io
         } catch (err) {
             alert('Failed to override triage');
         }
     };
 
+    const canOverride = user && (user.role === 'Doctor' || user.role === 'Admin');
+    const canDelete = user && user.role === 'Admin';
+
     // Count by triage level
     const triagedCount = patients.filter(p => p.triageScore > 0).length;
     const waitingCount = patients.filter(p => p.triageScore === 0).length;
+
+    if (authLoading) return null;
+    if (!user) return null;
 
     return (
         <div className="min-h-screen px-6 py-8">
@@ -293,13 +323,15 @@ export default function Dashboard() {
                                                         {formatTime(p.entryTime)}
                                                     </td>
                                                     <td className="px-4 py-3">
-                                                        <button onClick={(e) => { e.stopPropagation(); handleDelete(p._id); }}
-                                                            className="p-1.5 rounded-md transition-colors duration-150 cursor-pointer"
-                                                            style={{ color: 'var(--text-muted)' }}
-                                                            title="Delete patient"
-                                                        >
-                                                            🗑
-                                                        </button>
+                                                        {canDelete && (
+                                                            <button onClick={(e) => { e.stopPropagation(); handleDelete(p._id); }}
+                                                                className="p-1.5 rounded-md transition-colors duration-150 cursor-pointer"
+                                                                style={{ color: 'var(--text-muted)' }}
+                                                                title="Delete patient"
+                                                            >
+                                                                🗑
+                                                            </button>
+                                                        )}
                                                     </td>
                                                 </tr>
                                                 {/* Expanded detail row */}
@@ -315,13 +347,15 @@ export default function Dashboard() {
                                                                             style={{ color: 'var(--accent)' }}>
                                                                             AI Reasoning (SHAP Feature Impact)
                                                                         </h4>
-                                                                        <button
-                                                                            onClick={() => setOverrideModal({ isOpen: true, patientId: p._id, score: p.triageScore || 1, reason: p.overrideReason || '' })}
-                                                                            className="px-3 py-1 text-[11px] font-medium rounded-md transition-colors cursor-pointer"
-                                                                            style={{ background: 'var(--surface-3)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}
-                                                                        >
-                                                                            🧑‍⚕️ Override Score
-                                                                        </button>
+                                                                        {canOverride && (
+                                                                            <button
+                                                                                onClick={() => setOverrideModal({ isOpen: true, patientId: p._id, score: p.triageScore || 1, reason: p.overrideReason || '' })}
+                                                                                className="px-3 py-1 text-[11px] font-medium rounded-md transition-colors cursor-pointer"
+                                                                                style={{ background: 'var(--surface-3)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}
+                                                                            >
+                                                                                🧑‍⚕️ Override Score
+                                                                            </button>
+                                                                        )}
                                                                     </div>
                                                                     {p.shapDetails?.length > 0 ? (
                                                                         <div style={{ width: '100%', height: 160 }}>

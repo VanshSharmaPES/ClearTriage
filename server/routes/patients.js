@@ -2,8 +2,12 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const Patient = require('../models/Patient');
+const { authenticate, authorize } = require('../middleware/authMiddleware');
 
 const ML_SERVICE_URL = 'http://localhost:8000/predict';
+
+// Apply authentication to all patient routes
+router.use(authenticate);
 
 // GET /api/patients — list all patients (most urgent first, then newest)
 router.get('/', async (req, res) => {
@@ -99,8 +103,8 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// DELETE /api/patients/:id — delete a patient
-router.delete('/:id', async (req, res) => {
+// DELETE /api/patients/:id — delete a patient (Admin only)
+router.delete('/:id', authorize('Admin'), async (req, res) => {
     try {
         const patient = await Patient.findByIdAndDelete(req.params.id);
         if (!patient) return res.status(404).json({ error: 'Patient not found' });
@@ -111,8 +115,8 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
-// PATCH /api/patients/:id/override — manual human override
-router.patch('/:id/override', async (req, res) => {
+// PATCH /api/patients/:id/override — manual human override (Doctor/Admin only)
+router.patch('/:id/override', authorize('Doctor', 'Admin'), async (req, res) => {
     try {
         const { overrideScore, overrideReason } = req.body;
         const patient = await Patient.findByIdAndUpdate(
