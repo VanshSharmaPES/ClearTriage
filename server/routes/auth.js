@@ -22,6 +22,11 @@ router.post('/register', async (req, res) => {
             return res.status(409).json({ error: 'Username already taken.' });
         }
 
+        // Prevent self-registration as Admin
+        if (role === 'Admin') {
+            return res.status(403).json({ error: 'Admin accounts cannot be self-registered.' });
+        }
+
         const user = new User({
             username,
             password,

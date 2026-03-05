@@ -64,6 +64,19 @@ body {
   background: var(--border-hover);
 }
 
+/* Pulse glow animation for landing hero */
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.4));
+  }
+
+  50% {
+    filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.7));
+  }
+}
+
 /* "Why?" Hover Tooltip on Triage Badge */
 .triage-tooltip-wrapper:hover .triage-tooltip {
   opacity: 1 !important;
