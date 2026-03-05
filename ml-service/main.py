@@ -3,7 +3,6 @@ import io
 import os
 import hashlib
 import json
-import logging
 import numpy as np
 import pandas as pd
 import joblib

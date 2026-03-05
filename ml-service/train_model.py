@@ -1,7 +1,6 @@
 import sys
 import io
 import pandas as pd
-import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
@@ -82,7 +81,7 @@ def main():
         print(f"{labels[i]:>8}", '  '.join(f'{v:5d}' for v in row))
 
     # ── 6. Feature importance ────────────────────────────
-    print(f"\n🔑 Top 10 Feature Importances:")
+    print("\n🔑 Top 10 Feature Importances:")
     importances = pd.Series(model.feature_importances_, index=feature_names)
     for feat, imp in importances.nlargest(10).items():
         bar = '█' * int(imp * 50)
