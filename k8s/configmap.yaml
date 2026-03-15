@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: triage-config
+data:
+  # Server Config
+  MONGO_URI: "mongodb://mongo-service:27017/triage-system"
+  PORT: "3000"
+  ML_SERVICE_URL: "http://ml-service:8000/predict"
+  
+  # ML Service Config
+  REDIS_URL: "redis://redis-service:6379/0"
+  
+  # Next.js Config
+  NEXT_PUBLIC_API_URL: "http://server-service:3000"

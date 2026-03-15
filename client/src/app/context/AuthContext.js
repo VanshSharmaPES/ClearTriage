@@ -13,6 +13,7 @@ export function AuthProvider({ children }) {
     useEffect(() => {
         const savedToken = localStorage.getItem('ct_token');
         if (savedToken) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setToken(savedToken);
             // Verify token by calling /api/auth/me
             fetch('/api/auth/me', {

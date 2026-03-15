@@ -87,6 +87,7 @@ export default function Dashboard() {
         return () => {
             socket.disconnect();
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [token]);
 
     const handleDelete = async (id) => {
@@ -437,7 +438,7 @@ export default function Dashboard() {
             {/* Override Modal */}
             {overrideModal.isOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                    <div className="p-6 rounded-xl shadow-2xl w-[400px]" style={{ background: 'var(--surface-1)', border: '1px solid var(--border)' }}>
+                    <div className="p-6 rounded-xl shadow-2xl w-100" style={{ background: 'var(--surface-1)', border: '1px solid var(--border)' }}>
                         <h3 className="text-lg font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Override AI Triage</h3>
                         <div className="mb-4">
                             <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>New ESI Score (1-5)</label>

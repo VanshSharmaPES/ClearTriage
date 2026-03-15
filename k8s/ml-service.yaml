@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ml-service-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ml-service
+  template:
+    metadata:
+      labels:
+        app: ml-service
+    spec:
+      containers:
+      - name: ml-service
+        image: cleartriage-ml:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        envFrom:
+        - configMapRef:
+            name: triage-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ml-service
+spec:
+  type: ClusterIP
+  selector:
+    app: ml-service
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000

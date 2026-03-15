@@ -8,6 +8,9 @@ export default function ThemeToggle() {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        // Use a timeout or an animation frame if we want to avoid sync setState warnings,
+        // but typically for mounted state it's fine. We'll disable the lint rule for this line.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
     }, []);
 
@@ -16,7 +19,7 @@ export default function ThemeToggle() {
     return (
         <button
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="p-2 rounded-lg transition-all duration-200 cursor-pointer flex items-center justify-center cursor-pointer"
+            className="p-2 rounded-lg transition-all duration-200 cursor-pointer flex items-center justify-center"
             style={{ 
                 color: 'var(--text-secondary)',
                 background: 'var(--surface-2)',
