@@ -13,7 +13,11 @@ router.use(authenticate);
 router.get('/', async (req, res) => {
     try {
         // Ascending by ESI score: 1 (Immediate) first — clinically correct despite roadmap saying "Descending", because ESI 1 is the most urgent
-        const patients = await Patient.find().sort({ triageScore: 1, entryTime: -1 });
+        // FIX: The generator script created 50,000+ patients causing massive frontend rendering lag.
+        // We limit to the latest/most urgent 100 active patients.
+        const patients = await Patient.find({ status: { $ne: "Discharged" } })
+            .sort({ triageScore: 1, entryTime: -1 })
+            .limit(100);
         res.json(patients);
     } catch (err) {
         res.status(500).json({ error: err.message });
