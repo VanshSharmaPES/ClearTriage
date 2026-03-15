@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useAuth } from './context/AuthContext';
 import { useRouter } from 'next/navigation';
+import ThemeToggle from './ThemeToggle';
 
 const ROLE_COLORS = {
     Admin: '#ef4444',
@@ -70,6 +71,9 @@ export default function NavBar() {
                         </Link>
                     </>
                 ) : null}
+                <div className="ml-2 pl-2 flex items-center" style={{ borderLeft: '1px solid var(--border)' }}>
+                    <ThemeToggle />
+                </div>
             </div>
         </nav>
     );

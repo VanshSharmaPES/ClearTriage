@@ -1,22 +1,47 @@
 @import "tailwindcss";
 
 :root {
+  /* Default to Light Mode */
+  --color-background: #ffffff;
+  --color-foreground: #0a0a0a;
+
+  /* Triage ESI Colors */
+  --triage-1: #dc2626; /* Immediate - Darker Red */
+  --triage-2: #ea580c; /* Emergent - Darker Orange */
+  --triage-3: #ca8a04; /* Urgent - Darker Yellow */
+  --triage-4: #16a34a; /* Less Urgent - Darker Green */
+  --triage-5: #2563eb; /* Non-Urgent - Darker Blue */
+  --triage-0: #9ca3af; /* Unassigned - Gray */
+
+  /* Accent */
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
+  --accent-glow: rgba(79, 70, 229, 0.2);
+
+  /* Surface */
+  --surface-1: #f9fafb;
+  --surface-2: #f3f4f6;
+  --surface-3: #e5e7eb;
+  --border: #e5e7eb;
+  --border-hover: #d1d5db;
+
+  /* Text */
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
+}
+
+.dark {
   --color-background: #0a0a0a;
   --color-foreground: #ededed;
 
   /* Triage ESI Colors */
-  --triage-1: #ef4444;
-  /* Immediate - Red */
-  --triage-2: #f97316;
-  /* Emergent - Orange */
-  --triage-3: #eab308;
-  /* Urgent - Yellow */
-  --triage-4: #22c55e;
-  /* Less Urgent - Green */
-  --triage-5: #3b82f6;
-  /* Non-Urgent - Blue */
-  --triage-0: #6b7280;
-  /* Unassigned - Gray */
+  --triage-1: #ef4444; /* Immediate - Red */
+  --triage-2: #f97316; /* Emergent - Orange */
+  --triage-3: #eab308; /* Urgent - Yellow */
+  --triage-4: #22c55e; /* Less Urgent - Green */
+  --triage-5: #3b82f6; /* Non-Urgent - Blue */
+  --triage-0: #6b7280; /* Unassigned - Gray */
 
   /* Accent */
   --accent: #6366f1;
