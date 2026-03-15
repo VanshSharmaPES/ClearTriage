@@ -1,64 +1,70 @@
 @import "tailwindcss";
 
 :root {
-  /* Default to Light Mode */
-  --color-background: #ffffff;
-  --color-foreground: #0a0a0a;
+  /* Default to Light Mode - Clinical Refined */
+  --color-background: #fafafa;
+  --color-foreground: #09090b;
 
-  /* Triage ESI Colors */
-  --triage-1: #dc2626; /* Immediate - Darker Red */
-  --triage-2: #ea580c; /* Emergent - Darker Orange */
-  --triage-3: #ca8a04; /* Urgent - Darker Yellow */
-  --triage-4: #16a34a; /* Less Urgent - Darker Green */
-  --triage-5: #2563eb; /* Non-Urgent - Darker Blue */
-  --triage-0: #9ca3af; /* Unassigned - Gray */
+  /* Triage ESI Colors - High Contrast Medical */
+  --triage-1: #d90429;
+  --triage-2: #f97316;
+  --triage-3: #eab308;
+  --triage-4: #10b981;
+  --triage-5: #3b82f6;
+  --triage-0: #a1a1aa;
 
-  /* Accent */
-  --accent: #4f46e5;
-  --accent-hover: #4338ca;
-  --accent-glow: rgba(79, 70, 229, 0.2);
+  /* Accent - Glass Box Signature */
+  --accent: #0284c7;
+  --accent-hover: #0369a1;
+  --accent-glow: rgba(2, 132, 199, 0.15);
 
-  /* Surface */
-  --surface-1: #f9fafb;
-  --surface-2: #f3f4f6;
-  --surface-3: #e5e7eb;
-  --border: #e5e7eb;
-  --border-hover: #d1d5db;
+  /* Surface / Glass-box */
+  --surface-1: rgba(255, 255, 255, 0.8);
+  --surface-2: rgba(244, 244, 245, 0.7);
+  --surface-3: rgba(228, 228, 231, 0.6);
+  --border: rgba(0, 0, 0, 0.08);
+  --border-hover: rgba(0, 0, 0, 0.15);
 
   /* Text */
-  --text-primary: #111827;
-  --text-secondary: #4b5563;
-  --text-muted: #6b7280;
+  --text-primary: #09090b;
+  --text-secondary: #52525b;
+  --text-muted: #71717a;
+
+  /* Motif */
+  --bg-pattern: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px);
 }
 
 .dark {
-  --color-background: #0a0a0a;
-  --color-foreground: #ededed;
+  --color-background: #09090b;
+  --color-foreground: #fafafa;
 
   /* Triage ESI Colors */
-  --triage-1: #ef4444; /* Immediate - Red */
-  --triage-2: #f97316; /* Emergent - Orange */
-  --triage-3: #eab308; /* Urgent - Yellow */
-  --triage-4: #22c55e; /* Less Urgent - Green */
-  --triage-5: #3b82f6; /* Non-Urgent - Blue */
-  --triage-0: #6b7280; /* Unassigned - Gray */
+  --triage-1: #ef4444;
+  --triage-2: #fb923c;
+  --triage-3: #facc15;
+  --triage-4: #34d399;
+  --triage-5: #60a5fa;
+  --triage-0: #71717a;
 
   /* Accent */
-  --accent: #6366f1;
-  --accent-hover: #818cf8;
-  --accent-glow: rgba(99, 102, 241, 0.3);
+  --accent: #38bdf8;
+  --accent-hover: #7dd3fc;
+  --accent-glow: rgba(56, 189, 248, 0.2);
 
-  /* Surface */
-  --surface-1: #111111;
-  --surface-2: #1a1a1a;
-  --surface-3: #222222;
-  --border: #2a2a2a;
-  --border-hover: #3a3a3a;
+  /* Surface - Deep Glass */
+  --surface-1: rgba(24, 24, 27, 0.6);
+  --surface-2: rgba(39, 39, 42, 0.6);
+  --surface-3: rgba(63, 63, 70, 0.6);
+  --border: rgba(255, 255, 255, 0.1);
+  --border-hover: rgba(255, 255, 255, 0.2);
 
   /* Text */
-  --text-primary: #f5f5f5;
-  --text-secondary: #a3a3a3;
-  --text-muted: #737373;
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+
+  /* Motif */
+  --bg-pattern: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
 }
 
 * {
@@ -66,40 +72,46 @@
 }
 
 body {
-  background: var(--color-background);
+  background-color: var(--color-background);
+  background-image: var(--bg-pattern);
+  background-size: 24px 24px;
+  background-attachment: fixed;
   color: var(--color-foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-roboto), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+code, pre, .font-mono {
+  font-family: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+@keyframes pageFadeIn {
+  0% { opacity: 0; transform: translateY(8px) scale(0.99); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.page-transition {
+  animation: pageFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.glass-panel {
+  background: var(--surface-1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 24px -1px rgba(0,0,0,0.05);
 }
 
 /* Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--surface-1);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--border-hover);
-}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
 
 /* Pulse glow animation for landing hero */
 @keyframes pulse-glow {
-
-  0%,
-  100% {
-    filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.4));
-  }
-
-  50% {
-    filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.7));
-  }
+  0%, 100% { filter: drop-shadow(0 0 12px var(--accent-glow)); transform: scale(1); }
+  50% { filter: drop-shadow(0 0 24px var(--accent-glow)); transform: scale(1.02); }
 }
 
 /* "Why?" Hover Tooltip on Triage Badge */

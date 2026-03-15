@@ -107,8 +107,8 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// DELETE /api/patients/:id — delete a patient (Admin only)
-router.delete('/:id', authorize('Admin'), async (req, res) => {
+// DELETE /api/patients/:id — delete a patient
+router.delete('/:id', authorize('Admin', 'Doctor', 'Nurse'), async (req, res) => {
     try {
         const patient = await Patient.findByIdAndDelete(req.params.id);
         if (!patient) return res.status(404).json({ error: 'Patient not found' });

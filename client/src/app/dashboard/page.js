@@ -95,7 +95,7 @@ export default function Dashboard() {
         try {
             const res = await fetch(`/api/patients/${id}`, { method: 'DELETE', headers: authHeaders });
             if (res.status === 403) {
-                alert('Access denied. Only Admins can delete patients.');
+                alert('Access denied. You do not have permission to delete patients.');
                 return;
             }
             fetchPatients();
@@ -133,7 +133,7 @@ export default function Dashboard() {
     };
 
     const canOverride = user && (user.role === 'Doctor' || user.role === 'Admin');
-    const canDelete = user && user.role === 'Admin';
+    const canDelete = user && ['Admin', 'Doctor', 'Nurse'].includes(user.role);
 
     // Count by triage level
     const triagedCount = patients.filter(p => p.triageScore > 0).length;
@@ -143,13 +143,13 @@ export default function Dashboard() {
     if (!user) return null;
 
     return (
-        <div className="min-h-screen px-6 py-8">
+        <div className="min-h-[calc(100vh-80px)] px-6 py-12">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                     <div>
                         <h1 className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>
-                            Nurse Dashboard
+                            {user?.role ? `${user.role} Dashboard` : 'Dashboard'}
                         </h1>
                         <p className="mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>
                             {patients.length} patient{patients.length !== 1 ? 's' : ''} in queue
@@ -225,10 +225,10 @@ export default function Dashboard() {
                     <div className="rounded-xl overflow-hidden" style={{ border: '1px solid var(--border)' }}>
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm" style={{ borderCollapse: 'collapse' }}>
-                                <thead>
+                                <thead className="bg-gray-50/50 dark:bg-white/5 backdrop-blur-sm z-10 border-b" style={{ borderColor: 'var(--border)' }}>
                                     <tr style={{ background: 'var(--surface-2)' }}>
-                                        {['', 'Name', 'Age', 'Gender', 'Symptoms', 'HR', 'Temp', 'BP', 'O₂', 'Triage', 'Status', 'Entry Time', ''].map((h, i) => (
-                                            <th key={`${h}-${i}`} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
+                                        {['', 'Name', 'Age', 'Sex', 'Symptoms', 'HR', 'Temp', 'BP', 'O₂', 'Triage', 'Status', 'Entry Time', ''].map((h, i) => (
+                                            <th key={`${h}-${i}`} className="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider whitespace-nowrap"
                                                 style={{ color: 'var(--text-muted)', borderBottom: '1px solid var(--border)' }}>
                                                 {h}
                                             </th>
@@ -244,89 +244,85 @@ export default function Dashboard() {
                                         return (
                                             <Fragment key={p._id}>
                                                 <tr key={p._id}
-                                                    className="transition-colors duration-150 cursor-pointer"
+                                                    className="transition-colors duration-150 cursor-pointer hover:bg-gray-50/50 dark:hover:bg-white/5"
                                                     style={{ borderBottom: isExpanded ? 'none' : '1px solid var(--border)' }}
                                                     onClick={() => setExpandedId(isExpanded ? null : p._id)}
-                                                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--surface-2)'}
-                                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                                                 >
                                                     {/* Expand arrow */}
-                                                    <td className="px-4 py-3 text-xs" style={{ color: 'var(--text-muted)' }}>
+                                                    <td className="px-4 py-4 text-xs w-8 text-center" style={{ color: 'var(--text-muted)' }}>
                                                         <span style={{ display: 'inline-block', transition: 'transform 0.2s', transform: isExpanded ? 'rotate(90deg)' : 'rotate(0)' }}>▸</span>
                                                     </td>
-                                                    <td className="px-4 py-3 font-medium" style={{ color: 'var(--text-primary)' }}>
+                                                    <td className="px-4 py-4 font-semibold text-base whitespace-nowrap" style={{ color: 'var(--text-primary)' }}>
                                                         {p.name}
                                                     </td>
-                                                    <td className="px-4 py-3" style={{ color: 'var(--text-secondary)' }}>
+                                                    <td className="px-4 py-4 text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
                                                         {p.age}
                                                     </td>
-                                                    <td className="px-4 py-3" style={{ color: 'var(--text-secondary)' }}>
+                                                    <td className="px-4 py-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
                                                         {p.gender}
                                                     </td>
-                                                    <td className="px-4 py-3">
-                                                        <div className="flex flex-wrap gap-1">
+                                                    <td className="px-4 py-4 max-w-50">
+                                                        <div className="flex flex-wrap gap-1.5">
                                                             {p.symptoms?.map((s, i) => (
-                                                                <span key={i} className="px-2 py-0.5 rounded-full text-xs"
-                                                                    style={{ background: 'var(--surface-3)', color: 'var(--text-secondary)' }}>
+                                                                <span key={i} className="px-2.5 py-1 rounded-full text-xs font-medium truncate"
+                                                                    style={{ background: 'var(--surface-3)', color: 'var(--text-primary)' }}>
                                                                     {s}
                                                                 </span>
                                                             ))}
                                                         </div>
                                                     </td>
-                                                    <td className="px-4 py-3 font-mono text-xs" style={{ color: 'var(--text-secondary)' }}>
-                                                        {p.vitals?.heartRate ?? '—'}
+                                                    <td className="px-4 py-4 font-mono text-sm tracking-tight" style={{ color: 'var(--text-secondary)' }}>
+                                                        {p.vitals?.heartRate ? <span className="font-semibold text-gray-700 dark:text-gray-300">{p.vitals.heartRate}</span> : '—'}
                                                     </td>
-                                                    <td className="px-4 py-3 font-mono text-xs" style={{ color: 'var(--text-secondary)' }}>
-                                                        {p.vitals?.temp ?? '—'}°
+                                                    <td className="px-4 py-4 font-mono text-sm tracking-tight" style={{ color: 'var(--text-secondary)' }}>
+                                                        {p.vitals?.temp ? <span className="font-semibold text-gray-700 dark:text-gray-300">{p.vitals.temp}°</span> : '—'}
                                                     </td>
-                                                    <td className="px-4 py-3 font-mono text-xs" style={{ color: 'var(--text-secondary)' }}>
-                                                        {p.vitals?.bpSystolic ?? '—'}/{p.vitals?.bpDiastolic ?? '—'}
+                                                    <td className="px-4 py-4 font-mono text-sm tracking-tight whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
+                                                        {p.vitals?.bpSystolic ? <span className="font-semibold text-gray-700 dark:text-gray-300">{p.vitals.bpSystolic}/{p.vitals.bpDiastolic}</span> : '—'}
                                                     </td>
-                                                    <td className="px-4 py-3 font-mono text-xs" style={{ color: 'var(--text-secondary)' }}>
-                                                        {p.vitals?.o2Sat ?? '—'}%
+                                                    <td className="px-4 py-4 font-mono text-sm tracking-tight" style={{ color: 'var(--text-secondary)' }}>
+                                                        {p.vitals?.o2Sat ? <span className="font-semibold text-gray-700 dark:text-gray-300">{p.vitals.o2Sat}%</span> : '—'}
                                                     </td>
-                                                    <td className="px-4 py-3">
+                                                    <td className="px-4 py-4 whitespace-nowrap">
                                                         <div className="triage-tooltip-wrapper" style={{ position: 'relative', display: 'inline-block' }}>
-                                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold cursor-help"
-                                                                style={{ background: `${triageColor}20`, color: triageColor }}>
-                                                                <span className="w-1.5 h-1.5 rounded-full" style={{ background: triageColor }} />
+                                                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold cursor-help shadow-sm"
+                                                                style={{ background: `${triageColor}20`, color: triageColor, border: `1px solid ${triageColor}40` }}>
+                                                                <span className="w-2 h-2 rounded-full shadow-sm" style={{ background: triageColor }} />
                                                                 ESI {displayScore} {p.overrideScore ? '🧑‍⚕️' : ''} — {TRIAGE_LABELS[displayScore] || 'Unknown'}
                                                             </span>
                                                             {p.whyText && (
                                                                 <div className="triage-tooltip"
                                                                     style={{
                                                                         position: 'absolute', bottom: '100%', left: '50%',
-                                                                        transform: 'translateX(-50%)', marginBottom: '8px',
+                                                                        transform: 'translateX(-50%)', marginBottom: '10px',
                                                                         background: 'var(--surface-3)', color: 'var(--text-primary)',
-                                                                        padding: '8px 12px', borderRadius: '8px',
-                                                                        fontSize: '11px', whiteSpace: 'nowrap',
-                                                                        boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
-                                                                        border: `1px solid ${triageColor}40`,
-                                                                        pointerEvents: 'none', opacity: 0,
-                                                                        transition: 'opacity 0.2s',
-                                                                        zIndex: 50,
+                                                                        padding: '10px 14px', borderRadius: '10px', fontSize: '13px',
+                                                                        width: 'max-content', maxWidth: '300px',
+                                                                        whiteSpace: 'normal', opacity: 0,
+                                                                        pointerEvents: 'none', transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                                                                        boxShadow: '0 8px 30px rgba(0,0,0,0.3)',
+                                                                        border: '1px solid var(--border)', zIndex: 50,
+                                                                        lineHeight: '1.5'
                                                                     }}>
-                                                                    <div style={{ fontWeight: 600, marginBottom: '2px', color: triageColor }}>
-                                                                        Why?
-                                                                    </div>
-                                                                    {p.whyText}
+                                                                    <strong>AI Reasoning:</strong><br />
+                                                                    <span style={{ color: 'var(--text-secondary)' }}>{p.whyText}</span>
                                                                 </div>
                                                             )}
                                                         </div>
                                                     </td>
-                                                    <td className="px-4 py-3">
-                                                        <span className="px-2.5 py-1 rounded-full text-xs font-medium"
+                                                    <td className="px-4 py-4 whitespace-nowrap">
+                                                        <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider"
                                                             style={{ background: statusStyle.bg, color: statusStyle.color }}>
                                                             {p.status}
                                                         </span>
                                                     </td>
-                                                    <td className="px-4 py-3 text-xs" style={{ color: 'var(--text-muted)' }}>
+                                                    <td className="px-4 py-4 text-sm font-medium" style={{ color: 'var(--text-muted)' }}>
                                                         {formatTime(p.entryTime)}
                                                     </td>
-                                                    <td className="px-4 py-3">
+                                                    <td className="px-4 py-4 text-center">
                                                         {canDelete && (
                                                             <button onClick={(e) => { e.stopPropagation(); handleDelete(p._id); }}
-                                                                className="p-1.5 rounded-md transition-colors duration-150 cursor-pointer"
+                                                                className="p-2 rounded-lg transition-colors duration-150 cursor-pointer hover:bg-red-500/10 dark:hover:bg-red-500/20"
                                                                 style={{ color: 'var(--text-muted)' }}
                                                                 title="Delete patient"
                                                             >
@@ -339,12 +335,12 @@ export default function Dashboard() {
                                                 {isExpanded && (
                                                     <tr key={`${p._id}-detail`}
                                                         style={{ borderBottom: '1px solid var(--border)', background: 'var(--surface-1)' }}>
-                                                        <td colSpan={13} className="px-8 py-4">
-                                                            <div className="flex gap-8">
+                                                        <td colSpan={13} className="px-8 py-6 shadow-inner" style={{ borderTop: '1px solid var(--border)' }}>
+                                                            <div className="flex flex-col lg:flex-row gap-8">
                                                                 {/* AI Reasoning */}
-                                                                <div className="flex-1">
-                                                                    <div className="flex justify-between items-center mb-2">
-                                                                        <h4 className="text-xs font-semibold uppercase tracking-wider"
+                                                                <div className="flex-1 p-6 rounded-xl border" style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}>
+                                                                    <div className="flex justify-between items-center mb-4">
+                                                                        <h4 className="text-sm font-bold uppercase tracking-wider"
                                                                             style={{ color: 'var(--accent)' }}>
                                                                             AI Reasoning (SHAP Feature Impact)
                                                                         </h4>
@@ -371,7 +367,9 @@ export default function Dashboard() {
                                                                                     <YAxis dataKey="feature" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: 'var(--text-secondary)' }} width={120} />
                                                                                     <Tooltip
                                                                                         cursor={{ fill: 'var(--surface-3)', opacity: 0.4 }}
-                                                                                        contentStyle={{ background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '12px' }}
+                                                                                        contentStyle={{ background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '12px', color: 'var(--text-primary)' }}
+                                                                                        itemStyle={{ color: 'var(--text-primary)' }}
+                                                                                        labelStyle={{ color: 'var(--text-primary)', fontWeight: 'bold' }}
                                                                                         formatter={(value, name, props) => [`${props.payload.text}`, 'Impact']}
                                                                                     />
                                                                                     <Bar dataKey="impact" radius={[0, 4, 4, 0]} barSize={20}>
@@ -406,19 +404,29 @@ export default function Dashboard() {
                                                                 </div>
                                                                 {/* Vitals detail */}
                                                                 <div>
-                                                                    <h4 className="text-xs font-semibold uppercase tracking-wider mb-2"
-                                                                        style={{ color: 'var(--accent)' }}>
-                                                                        Full Vitals
-                                                                    </h4>
-                                                                    <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-xs">
-                                                                        <span style={{ color: 'var(--text-muted)' }}>Heart Rate</span>
-                                                                        <span style={{ color: 'var(--text-primary)' }}>{p.vitals?.heartRate ?? '—'} bpm</span>
-                                                                        <span style={{ color: 'var(--text-muted)' }}>Temperature</span>
-                                                                        <span style={{ color: 'var(--text-primary)' }}>{p.vitals?.temp ?? '—'}°</span>
-                                                                        <span style={{ color: 'var(--text-muted)' }}>Blood Pressure</span>
-                                                                        <span style={{ color: 'var(--text-primary)' }}>{p.vitals?.bpSystolic ?? '—'}/{p.vitals?.bpDiastolic ?? '—'} mmHg</span>
-                                                                        <span style={{ color: 'var(--text-muted)' }}>O₂ Saturation</span>
-                                                                        <span style={{ color: 'var(--text-primary)' }}>{p.vitals?.o2Sat ?? '—'}%</span>
+                                                                    <div className="p-6 rounded-xl border h-full" style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}>
+                                                                        <h4 className="text-sm font-bold uppercase tracking-wider mb-4"
+                                                                            style={{ color: 'var(--accent)' }}>
+                                                                            Patient Vitals
+                                                                        </h4>
+                                                                        <div className="space-y-4 text-sm">
+                                                                            <div className="flex justify-between border-b pb-2" style={{ borderColor: 'var(--border)' }}>
+                                                                                <span className="font-medium" style={{ color: 'var(--text-muted)' }}>Heart Rate</span>
+                                                                                <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>{p.vitals?.heartRate ?? '—'} bpm</span>
+                                                                            </div>
+                                                                            <div className="flex justify-between border-b pb-2" style={{ borderColor: 'var(--border)' }}>
+                                                                                <span className="font-medium" style={{ color: 'var(--text-muted)' }}>Temperature</span>
+                                                                                <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>{p.vitals?.temp ?? '—'}°F</span>
+                                                                            </div>
+                                                                            <div className="flex justify-between gap-12 border-b pb-2" style={{ borderColor: 'var(--border)' }}>
+                                                                                <span className="font-medium" style={{ color: 'var(--text-muted)' }}>Blood Pressure</span>
+                                                                                <span className="font-semibold text-right" style={{ color: 'var(--text-primary)' }}>{p.vitals?.bpSystolic ?? '—'} / {p.vitals?.bpDiastolic ?? '—'} <span className="text-xs font-normal" style={{ color: 'var(--text-muted)' }}>mmHg</span></span>
+                                                                            </div>
+                                                                            <div className="flex justify-between pb-2">
+                                                                                <span className="font-medium" style={{ color: 'var(--text-muted)' }}>SpO₂</span>
+                                                                                <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>{p.vitals?.o2Sat ?? '—'}%</span>
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>

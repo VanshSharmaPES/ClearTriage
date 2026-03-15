@@ -48,7 +48,7 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center px-6">
+        <div className="min-h-[calc(100vh-80px)] flex items-center justify-center px-6">
             <div className="w-full max-w-md">
                 <div className="text-center mb-8">
                     <span className="text-5xl block mb-4">🔐</span>
@@ -80,7 +80,7 @@ export default function LoginPage() {
                                 value={form.username}
                                 onChange={(e) => setForm({ ...form, username: e.target.value })}
                                 placeholder="Enter your username"
-                                className="w-full px-3 py-2.5 rounded-lg text-sm transition-colors focus:border-[var(--accent)]"
+                                className="w-full px-3 py-2.5 rounded-lg text-sm transition-colors focus:border-(--accent)"
                                 style={inputStyle}
                                 autoFocus
                             />
@@ -95,7 +95,7 @@ export default function LoginPage() {
                                 value={form.password}
                                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                                 placeholder="Enter your password"
-                                className="w-full px-3 py-2.5 rounded-lg text-sm transition-colors focus:border-[var(--accent)]"
+                                className="w-full px-3 py-2.5 rounded-lg text-sm transition-colors focus:border-(--accent)"
                                 style={inputStyle}
                             />
                         </div>

@@ -21,37 +21,37 @@ export default function NavBar() {
     };
 
     return (
-        <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-3 border-b"
-            style={{ background: 'var(--surface-1)', borderColor: 'var(--border)' }}>
-            <Link href="/" className="flex items-center gap-2 no-underline">
-                <span className="text-xl font-bold" style={{ color: 'var(--accent)' }}>⚕</span>
-                <span className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>ClearTriage</span>
+        <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 glass-panel"
+            style={{ borderRadius: '0', borderLeft: 'none', borderRight: 'none', borderTop: 'none' }}>
+            <Link href="/" className="flex items-center gap-2 no-underline group">
+                <span className="text-xl font-bold transition-transform group-hover:scale-110" style={{ color: 'var(--accent)' }}>⚡</span>
+                <span className="text-lg font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>ClearTriage</span>
             </Link>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
                 {!loading && user ? (
                     <>
                         <Link href="/dashboard"
-                            className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 no-underline"
-                            style={{ color: 'var(--text-secondary)' }}>
+                            className="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 no-underline hover:bg-black/5 dark:hover:bg-white/5"
+                            style={{ color: 'var(--text-primary)' }}>
                             Dashboard
                         </Link>
                         <Link href="/admit"
-                            className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 no-underline"
-                            style={{ color: 'var(--text-secondary)' }}>
+                            className="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 no-underline hover:bg-black/5 dark:hover:bg-white/5"
+                            style={{ color: 'var(--text-primary)' }}>
                             Admit Patient
                         </Link>
-                        <div className="flex items-center gap-2 ml-4 pl-4" style={{ borderLeft: '1px solid var(--border)' }}>
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider"
-                                style={{ background: `${ROLE_COLORS[user.role] || '#6b7280'}20`, color: ROLE_COLORS[user.role] || '#6b7280' }}>
+                        <div className="flex items-center gap-3 ml-4 pl-4" style={{ borderLeft: '1px solid var(--border)' }}>
+                            <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest"
+                                style={{ background: `${ROLE_COLORS[user.role] || '#6b7280'}15`, color: ROLE_COLORS[user.role] || '#6b7280', border: `1px solid ${ROLE_COLORS[user.role]}30` }}>
                                 {user.role}
                             </span>
-                            <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+                            <span className="text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>
                                 {user.username}
                             </span>
                             <button
                                 onClick={handleLogout}
-                                className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 cursor-pointer"
-                                style={{ color: 'var(--text-muted)', background: 'var(--surface-2)', border: '1px solid var(--border)' }}
+                                className="px-4 py-2 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer uppercase tracking-wider hover:bg-black/5 dark:hover:bg-white/5"
+                                style={{ color: 'var(--text-primary)', border: '1px solid var(--border)' }}
                             >
                                 Logout
                             </button>
@@ -60,13 +60,13 @@ export default function NavBar() {
                 ) : !loading ? (
                     <>
                         <Link href="/login"
-                            className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 no-underline"
-                            style={{ color: 'var(--text-secondary)' }}>
+                            className="px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 no-underline hover:bg-black/5 dark:hover:bg-white/5"
+                            style={{ color: 'var(--text-primary)' }}>
                             Sign In
                         </Link>
                         <Link href="/register"
-                            className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 no-underline"
-                            style={{ background: 'var(--accent)', color: '#fff', borderRadius: '8px' }}>
+                            className="px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 no-underline shadow-sm hover:scale-105"
+                            style={{ background: 'var(--text-primary)', color: 'var(--color-background)' }}>
                             Register
                         </Link>
                     </>

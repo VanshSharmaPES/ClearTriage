@@ -137,7 +137,7 @@ export default function AdmitPatient() {
     if (!user) return null;
 
     return (
-        <div className="min-h-screen px-6 py-8">
+        <div className="min-h-[calc(100vh-80px)] px-6 py-12">
             <div className="max-w-2xl mx-auto">
                 {/* Header */}
                 <div className="mb-8">
@@ -175,7 +175,7 @@ export default function AdmitPatient() {
                                     value={form.name}
                                     onChange={(e) => updateField('name', e.target.value)}
                                     placeholder="Enter patient name"
-                                    className="w-full px-3 py-2.5 rounded-lg text-sm transition-colors focus:border-[var(--accent)]"
+                                    className="w-full px-3 py-2.5 rounded-lg text-sm transition-colors focus:border-(--accent)"
                                     style={inputStyle}
                                 />
                             </div>
@@ -187,7 +187,7 @@ export default function AdmitPatient() {
                                     onChange={(e) => updateField('age', e.target.value)}
                                     placeholder="Age"
                                     min="0" max="150"
-                                    className="w-full px-3 py-2.5 rounded-lg text-sm transition-colors focus:border-[var(--accent)]"
+                                    className="w-full px-3 py-2.5 rounded-lg text-sm transition-colors focus:border-(--accent)"
                                     style={inputStyle}
                                 />
                             </div>
@@ -249,7 +249,7 @@ export default function AdmitPatient() {
                                 onChange={(e) => setCustomSymptom(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCustomSymptom())}
                                 placeholder="Add custom symptom..."
-                                className="flex-1 px-3 py-2 rounded-lg text-sm transition-colors focus:border-[var(--accent)]"
+                                className="flex-1 px-3 py-2 rounded-lg text-sm transition-colors focus:border-(--accent)"
                                 style={inputStyle}
                             />
                             <button type="button" onClick={addCustomSymptom}
@@ -276,7 +276,7 @@ export default function AdmitPatient() {
                                     value={form.vitals.heartRate}
                                     onChange={(e) => updateVital('heartRate', e.target.value)}
                                     placeholder="e.g. 80"
-                                    className="w-full px-3 py-2.5 rounded-lg text-sm transition-colors focus:border-[var(--accent)]"
+                                    className="w-full px-3 py-2.5 rounded-lg text-sm transition-colors focus:border-(--accent)"
                                     style={inputStyle}
                                 />
                             </div>
@@ -288,7 +288,7 @@ export default function AdmitPatient() {
                                     value={form.vitals.temp}
                                     onChange={(e) => updateVital('temp', e.target.value)}
                                     placeholder="e.g. 98.6"
-                                    className="w-full px-3 py-2.5 rounded-lg text-sm transition-colors focus:border-[var(--accent)]"
+                                    className="w-full px-3 py-2.5 rounded-lg text-sm transition-colors focus:border-(--accent)"
                                     style={inputStyle}
                                 />
                             </div>
@@ -299,7 +299,7 @@ export default function AdmitPatient() {
                                     value={form.vitals.o2Sat}
                                     onChange={(e) => updateVital('o2Sat', e.target.value)}
                                     placeholder="e.g. 98"
-                                    className="w-full px-3 py-2.5 rounded-lg text-sm transition-colors focus:border-[var(--accent)]"
+                                    className="w-full px-3 py-2.5 rounded-lg text-sm transition-colors focus:border-(--accent)"
                                     style={inputStyle}
                                 />
                             </div>
@@ -310,7 +310,7 @@ export default function AdmitPatient() {
                                     value={form.vitals.bpSystolic}
                                     onChange={(e) => updateVital('bpSystolic', e.target.value)}
                                     placeholder="e.g. 120"
-                                    className="w-full px-3 py-2.5 rounded-lg text-sm transition-colors focus:border-[var(--accent)]"
+                                    className="w-full px-3 py-2.5 rounded-lg text-sm transition-colors focus:border-(--accent)"
                                     style={inputStyle}
                                 />
                             </div>
@@ -321,7 +321,7 @@ export default function AdmitPatient() {
                                     value={form.vitals.bpDiastolic}
                                     onChange={(e) => updateVital('bpDiastolic', e.target.value)}
                                     placeholder="e.g. 80"
-                                    className="w-full px-3 py-2.5 rounded-lg text-sm transition-colors focus:border-[var(--accent)]"
+                                    className="w-full px-3 py-2.5 rounded-lg text-sm transition-colors focus:border-(--accent)"
                                     style={inputStyle}
                                 />
                             </div>

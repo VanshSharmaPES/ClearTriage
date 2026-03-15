@@ -46,7 +46,7 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center px-6">
+        <div className="min-h-[calc(100vh-80px)] flex flex-col items-center justify-center px-6 py-12">
             <div className="w-full max-w-md">
                 <div className="text-center mb-8">
                     <span className="text-5xl block mb-4">👤</span>
@@ -78,7 +78,7 @@ export default function RegisterPage() {
                                 value={form.username}
                                 onChange={(e) => setForm({ ...form, username: e.target.value })}
                                 placeholder="Choose a username"
-                                className="w-full px-3 py-2.5 rounded-lg text-sm transition-colors focus:border-[var(--accent)]"
+                                className="w-full px-3 py-2.5 rounded-lg text-sm transition-colors focus:border-(--accent)"
                                 style={inputStyle}
                                 autoFocus
                             />
@@ -93,7 +93,7 @@ export default function RegisterPage() {
                                 value={form.password}
                                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                                 placeholder="Min. 6 characters"
-                                className="w-full px-3 py-2.5 rounded-lg text-sm transition-colors focus:border-[var(--accent)]"
+                                className="w-full px-3 py-2.5 rounded-lg text-sm transition-colors focus:border-(--accent)"
                                 style={inputStyle}
                             />
                         </div>

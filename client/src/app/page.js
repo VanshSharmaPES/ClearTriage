@@ -15,34 +15,34 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6" style={{ overflow: 'hidden' }}>
-      <div className="max-w-2xl text-center">
+    <div className="min-h-[calc(100vh-80px)] flex flex-col items-center pt-24 px-6 pb-32" style={{ overflow: 'hidden' }}>
+      <div className="max-w-2xl text-center flex-1 flex flex-col justify-center w-full">
         {/* Hero — animated entrance */}
         <div
-          className="mb-8"
+          className="mb-12 relative"
           style={{
             opacity: mounted ? 1 : 0,
             transform: mounted ? 'translateY(0)' : 'translateY(30px)',
             transition: 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
           }}
         >
-          <span className="text-6xl mb-4 block" style={{
-            animation: mounted ? 'pulse-glow 2s ease-in-out infinite' : 'none',
-          }}>⚕</span>
-          <h1 className="text-5xl font-bold mb-4 tracking-tight"
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-sky-500/20 dark:bg-sky-500/10 blur-[80px] rounded-full -z-10" />
+          <span className="text-6xl mb-2 block" style={{
+            animation: mounted ? 'pulse-glow 3s ease-in-out infinite' : 'none',
+          }}>⚡</span>
+          <h1 className="text-6xl md:text-7xl font-extrabold mb-6 tracking-tight"
             style={{ color: 'var(--text-primary)' }}>
             Clear<span style={{ color: 'var(--accent)' }}>Triage</span>
           </h1>
-          <p className="text-lg leading-relaxed max-w-lg mx-auto"
+          <p className="text-lg md:text-xl leading-relaxed max-w-2xl mx-auto font-medium"
             style={{ color: 'var(--text-secondary)' }}>
-            An intelligent, explainable AI-powered hospital triage system.
-            Prioritize patients with transparent, evidence-based urgency scoring.
+            Intelligent, explainable algorithms that fuse advanced <span className="text-sky-600 dark:text-sky-400">SHAP analytics</span> with rapid hospital triage. Prioritize with clarity.
           </p>
         </div>
 
         {/* CTA Buttons — staggered animation */}
         <div
-          className="flex flex-col sm:flex-row gap-4 justify-center"
+          className="flex flex-col sm:flex-row gap-5 justify-center"
           style={{
             opacity: mounted ? 1 : 0,
             transform: mounted ? 'translateY(0)' : 'translateY(20px)',
@@ -53,20 +53,18 @@ export default function Home() {
             // Logged in — show app navigation
             <>
               <Link href="/dashboard"
-                className="inline-flex items-center justify-center px-6 py-3 rounded-xl text-base font-semibold transition-all duration-300 no-underline hover:scale-105"
+                className="inline-flex items-center justify-center px-8 py-4 rounded-full text-sm uppercase tracking-wider font-bold transition-all duration-300 no-underline hover:scale-105"
                 style={{
-                  background: 'var(--accent)',
-                  color: '#fff',
-                  boxShadow: '0 0 20px var(--accent-glow)',
+                  background: 'var(--text-primary)',
+                  color: 'var(--color-background)',
+                  boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
                 }}>
-                Open Dashboard →
+                Launch Dashboard →
               </Link>
               <Link href="/admit"
-                className="inline-flex items-center justify-center px-6 py-3 rounded-xl text-base font-semibold transition-all duration-300 no-underline border hover:scale-105"
+                className="glass-panel inline-flex items-center justify-center px-8 py-4 rounded-full text-sm uppercase tracking-wider font-bold transition-all duration-300 no-underline hover:scale-105 hover:bg-black/5 dark:hover:bg-white/5"
                 style={{
-                  borderColor: 'var(--border)',
-                  color: 'var(--text-secondary)',
-                  background: 'var(--surface-2)',
+                  color: 'var(--text-primary)',
                 }}>
                 Admit Patient
               </Link>
@@ -75,22 +73,20 @@ export default function Home() {
             // Not logged in — show auth buttons
             <>
               <Link href="/login"
-                className="inline-flex items-center justify-center px-8 py-3.5 rounded-xl text-base font-semibold transition-all duration-300 no-underline hover:scale-105"
+                className="inline-flex items-center justify-center px-10 py-4 rounded-full text-sm uppercase tracking-wider font-bold transition-all duration-300 no-underline hover:scale-105"
                 style={{
-                  background: 'var(--accent)',
-                  color: '#fff',
-                  boxShadow: '0 0 25px var(--accent-glow)',
+                  background: 'var(--text-primary)',
+                  color: 'var(--color-background)',
+                  boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
                 }}>
-                Sign In →
+                Access System →
               </Link>
               <Link href="/register"
-                className="inline-flex items-center justify-center px-8 py-3.5 rounded-xl text-base font-semibold transition-all duration-300 no-underline border hover:scale-105"
+                className="glass-panel inline-flex items-center justify-center px-10 py-4 rounded-full text-sm uppercase tracking-wider font-bold transition-all duration-300 no-underline hover:scale-105 hover:bg-black/5 dark:hover:bg-white/5"
                 style={{
-                  borderColor: 'var(--border)',
-                  color: 'var(--text-secondary)',
-                  background: 'var(--surface-2)',
+                  color: 'var(--text-primary)',
                 }}>
-                Create Account
+                Authorized Registration
               </Link>
             </>
           ) : null}
@@ -98,7 +94,7 @@ export default function Home() {
 
         {/* Feature highlights — staggered */}
         <div
-          className="mt-14 grid grid-cols-1 sm:grid-cols-3 gap-4"
+          className="mt-20 grid grid-cols-1 sm:grid-cols-3 gap-6"
           style={{
             opacity: mounted ? 1 : 0,
             transform: mounted ? 'translateY(0)' : 'translateY(20px)',
@@ -106,26 +102,23 @@ export default function Home() {
           }}
         >
           {[
-            { icon: '🔮', title: 'Explainable AI', desc: 'SHAP-powered reasoning for every triage decision' },
-            { icon: '⚡', title: 'Real-Time', desc: 'WebSocket-driven live updates across all clients' },
-            { icon: '🛡️', title: 'Role-Based', desc: 'Secure access control for Nurses, Doctors & Admins' },
-          ].map(({ icon, title, desc }) => (
+            { tag: '01', title: 'Radical Transparency', desc: 'SHAP force plots explain every algorithmic decision to clinicians.' },
+            { tag: '02', title: 'Zero Latency', desc: 'WebSocket-driven synchronization. No polling, pure speed.' },
+            { tag: '03', title: 'Secure Enclave', desc: 'Strict RBAC protocols. Keep patient data segmented and protected.' },
+          ].map(({ tag, title, desc }) => (
             <div key={title}
-              className="p-4 rounded-xl text-left transition-all duration-300 hover:scale-105"
-              style={{
-                background: 'var(--surface-1)',
-                border: '1px solid var(--border)',
-              }}>
-              <span className="text-2xl block mb-2">{icon}</span>
-              <h3 className="text-sm font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>{title}</h3>
-              <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>{desc}</p>
+              className="glass-panel p-8 rounded-2xl text-left transition-all duration-500 hover:-translate-y-2 group"
+            >
+              <div className="text-xs font-mono mb-6 text-sky-500 font-bold tracking-widest">{tag} //</div>
+              <h3 className="text-lg font-bold mb-3 tracking-tight" style={{ color: 'var(--text-primary)' }}>{title}</h3>
+              <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{desc}</p>
             </div>
           ))}
         </div>
 
         {/* ESI badges — staggered */}
         <div
-          className="mt-10 flex justify-center gap-6 flex-wrap"
+          className="mt-24 mb-12 flex justify-center gap-6 md:gap-8 flex-wrap glass-panel px-6 md:px-8 py-4 rounded-3xl md:rounded-full mx-auto w-[90%] md:w-fit"
           style={{
             opacity: mounted ? 1 : 0,
             transform: mounted ? 'translateY(0)' : 'translateY(20px)',
