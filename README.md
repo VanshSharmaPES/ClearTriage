@@ -60,9 +60,16 @@ ClearTriage/
 - **"Why?" hover tooltip** on triage badges shows compact reasoning with raw vitals
 - Stored per-patient in `aiReasoning` (detailed) and `whyText` (compact)
 
-### 🏥 Clinical Dashboard
-- Real-time patient queue with auto-polling (5s)
+### 🤖 Active Learning (Automated Model Retraining)
+- **Human Override Loop**: `retrain_pipeline.py` fetches data where human doctors overwrote AI scores.
+- Model re-calibrates dataset mappings by artificially weighting correct human interventions vs old data inputs.
+- Continually enhances Random Forest classification accuracy and minimizes algorithmic bias on dataset drifts.
+
+### 🏥 Clinical Dashboard & Security
+- Real-time patient queue with WebSocket auto-polling 
 - Triage-color-coded rows, sorted by urgency (ESI 1 on top)
+- Dark mode compatibility for accessibility 
+- **Security:** Role-based JWT Access Control (Admin/Doctor/Nurse) with authenticated endpoints
 - Expandable rows showing full SHAP reasoning
 - Delete patients with confirmation
 
