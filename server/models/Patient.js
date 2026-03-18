@@ -19,7 +19,9 @@ const PatientSchema = new mongoose.Schema({
     overrideScore: { type: Number, default: null },
     overrideReason: { type: String, default: null },
     status: { type: String, default: 'Waiting' },
-    entryTime: { type: Date, default: Date.now }
+    entryTime: { type: Date, default: Date.now },
+    dischargeTime: { type: Date, default: null },
+    dischargeNote: { type: String, default: null }
 });
 
 module.exports = mongoose.model('Patient', PatientSchema);

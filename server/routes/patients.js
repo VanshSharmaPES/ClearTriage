@@ -119,6 +119,30 @@ router.delete('/:id', authorize('Admin', 'Doctor', 'Nurse'), async (req, res) =>
     }
 });
 
+// PATCH /api/patients/:id/status — update patient workflow status
+router.patch('/:id/status', authorize('Admin', 'Doctor', 'Nurse'), async (req, res) => {
+    try {
+        const { status, dischargeNote } = req.body;
+        const updateData = { status };
+        
+        if (status === 'Discharged') {
+            updateData.dischargeTime = new Date();
+            if (dischargeNote) updateData.dischargeNote = dischargeNote;
+        }
+
+        const patient = await Patient.findByIdAndUpdate(
+            req.params.id,
+            updateData,
+            { new: true }
+        );
+        if (!patient) return res.status(404).json({ error: 'Patient not found' });
+        req.app.get('io').emit('patientUpdated', patient);
+        res.json(patient);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
 // PATCH /api/patients/:id/override — manual human override (Doctor/Admin only)
 router.patch('/:id/override', authorize('Doctor', 'Admin'), async (req, res) => {
     try {

@@ -40,6 +40,7 @@ export default function Dashboard() {
     const [lastUpdated, setLastUpdated] = useState(null);
     const [expandedId, setExpandedId] = useState(null);
     const [overrideModal, setOverrideModal] = useState({ isOpen: false, patientId: null, score: 1, reason: '' });
+    const [dischargeModal, setDischargeModal] = useState({ isOpen: false, patientId: null, note: '' });
 
     // Redirect to login if not authenticated
     useEffect(() => {
@@ -126,9 +127,31 @@ export default function Dashboard() {
                 alert('Access denied. Only Doctors and Admins can override triage scores.');
                 return;
             }
+            if (!res.ok) throw new Error('Override failed');
             setOverrideModal({ isOpen: false, patientId: null, score: 1, reason: '' });
         } catch (err) {
             alert('Failed to override triage');
+        }
+    };
+
+    const updateStatus = async (id, newStatus, note = '') => {
+        try {
+            const res = await fetch(`/api/patients/${id}/status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', ...authHeaders },
+                body: JSON.stringify({ status: newStatus, dischargeNote: note })
+            });
+            if (res.status === 403) {
+                alert('Access denied. Insufficient permissions to update status.');
+                return;
+            }
+            if (!res.ok) throw new Error('Status update failed');
+            if (newStatus === 'Discharged') {
+                setDischargeModal({ isOpen: false, patientId: null, note: '' });
+                if (expandedId === id) setExpandedId(null);
+            }
+        } catch (err) {
+            alert('Failed to update patient status: ' + err.message);
         }
     };
 
@@ -440,6 +463,40 @@ export default function Dashboard() {
                                                                         </div>
                                                                     </div>
                                                                 </div>
+                                                                {/* Workflow Actions */}
+                                                                <div>
+                                                                    <div className="p-6 rounded-xl border h-full min-w-[200px]" style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}>
+                                                                        <h4 className="text-sm font-bold uppercase tracking-wider mb-4"
+                                                                            style={{ color: 'var(--accent)' }}>
+                                                                            Actions
+                                                                        </h4>
+                                                                        <div className="flex flex-col gap-3">
+                                                                            {(p.status === 'Waiting' || p.status === 'Triaged') && (
+                                                                                <button
+                                                                                    onClick={() => updateStatus(p._id, 'Admitted')}
+                                                                                    className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition font-medium w-full text-center"
+                                                                                >
+                                                                                    Admit to Treatment
+                                                                                </button>
+                                                                            )}
+                                                                            {p.status === 'Admitted' && (
+                                                                                <button
+                                                                                    onClick={() => setDischargeModal({ isOpen: true, patientId: p._id, note: '' })}
+                                                                                    className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition font-medium w-full text-center"
+                                                                                >
+                                                                                    Discharge Patient
+                                                                                </button>
+                                                                            )}
+                                                                            <button
+                                                                                onClick={() => setExpandedId(null)}
+                                                                                className="mt-auto px-4 py-2 text-sm rounded-lg transition font-medium w-full text-center"
+                                                                                style={{ background: 'var(--surface-3)', color: 'var(--text-secondary)', border: '1px solid var(--border)' }}
+                                                                            >
+                                                                                Close Details
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -497,6 +554,41 @@ export default function Dashboard() {
                                 style={{ background: 'var(--accent)', color: '#fff' }}
                             >
                                 Submit Override
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Discharge Modal */}
+            {dischargeModal.isOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div className="p-6 rounded-xl shadow-2xl w-100" style={{ background: 'var(--surface-1)', border: '1px solid var(--border)' }}>
+                        <h3 className="text-lg font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Discharge Patient</h3>
+                        <div className="mb-4">
+                            <label htmlFor="discharge-note" className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>Discharge Note / Recovery Details</label>
+                            <textarea
+                                id="discharge-note"
+                                value={dischargeModal.note}
+                                onChange={(e) => setDischargeModal({ ...dischargeModal, note: e.target.value })}
+                                placeholder="e.g. Patient stabilized after treatment, referred to PCP..."
+                                className="w-full rounded p-2 text-sm outline-none resize-none h-24"
+                                style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+                            />
+                        </div>
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={() => setDischargeModal({ isOpen: false, patientId: null, note: '' })}
+                                className="px-4 py-2 text-sm font-medium transition-colors cursor-pointer"
+                                style={{ color: 'var(--text-secondary)' }}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => updateStatus(dischargeModal.patientId, 'Discharged', dischargeModal.note)}
+                                className="px-4 py-2 text-sm font-medium rounded transition-colors cursor-pointer disabled:opacity-50 bg-green-600 hover:bg-green-700 text-white"
+                            >
+                                Confirm Discharge
                             </button>
                         </div>
                     </div>
