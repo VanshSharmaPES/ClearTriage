@@ -143,7 +143,7 @@ export default function Dashboard() {
     if (!user) return null;
 
     return (
-        <div className="min-h-[calc(100vh-80px)] px-6 py-12">
+        <main className="min-h-[calc(100vh-80px)] px-6 py-12">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
@@ -244,9 +244,19 @@ export default function Dashboard() {
                                         return (
                                             <Fragment key={p._id}>
                                                 <tr key={p._id}
-                                                    className="transition-colors duration-150 cursor-pointer hover:bg-gray-50/50 dark:hover:bg-white/5"
+                                                    className="transition-colors duration-150 cursor-pointer hover:bg-gray-50/50 dark:hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-var(--accent)"
                                                     style={{ borderBottom: isExpanded ? 'none' : '1px solid var(--border)' }}
                                                     onClick={() => setExpandedId(isExpanded ? null : p._id)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter' || e.key === ' ') {
+                                                            e.preventDefault();
+                                                            setExpandedId(isExpanded ? null : p._id);
+                                                        }
+                                                    }}
+                                                    tabIndex="0"
+                                                    role="button"
+                                                    aria-expanded={isExpanded}
+                                                    aria-label={`View details for ${p.name}`}
                                                 >
                                                     {/* Expand arrow */}
                                                     <td className="px-4 py-4 text-xs w-8 text-center" style={{ color: 'var(--text-muted)' }}>
@@ -325,6 +335,7 @@ export default function Dashboard() {
                                                                 className="p-2 rounded-lg transition-colors duration-150 cursor-pointer hover:bg-red-500/10 dark:hover:bg-red-500/20"
                                                                 style={{ color: 'var(--text-muted)' }}
                                                                 title="Delete patient"
+                                                                aria-label={`Delete patient ${p.name}`}
                                                             >
                                                                 🗑
                                                             </button>
@@ -449,8 +460,9 @@ export default function Dashboard() {
                     <div className="p-6 rounded-xl shadow-2xl w-100" style={{ background: 'var(--surface-1)', border: '1px solid var(--border)' }}>
                         <h3 className="text-lg font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Override AI Triage</h3>
                         <div className="mb-4">
-                            <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>New ESI Score (1-5)</label>
+                            <label htmlFor="override-score" className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>New ESI Score (1-5)</label>
                             <select
+                                id="override-score"
                                 value={overrideModal.score}
                                 onChange={(e) => setOverrideModal({ ...overrideModal, score: Number(e.target.value) })}
                                 className="w-full rounded p-2 text-sm outline-none"
@@ -460,8 +472,9 @@ export default function Dashboard() {
                             </select>
                         </div>
                         <div className="mb-4">
-                            <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>Reason for Override</label>
+                            <label htmlFor="override-reason" className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>Reason for Override</label>
                             <textarea
+                                id="override-reason"
                                 value={overrideModal.reason}
                                 onChange={(e) => setOverrideModal({ ...overrideModal, reason: e.target.value })}
                                 placeholder="e.g. AI missed critical context from history..."

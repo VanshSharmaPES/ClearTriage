@@ -169,8 +169,9 @@ export default function AdmitPatient() {
 
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                             <div className="sm:col-span-2">
-                                <label className="block text-xs font-medium mb-1.5" style={labelStyle}>Full Name</label>
+                                <label htmlFor="patient-name" className="block text-xs font-medium mb-1.5" style={labelStyle}>Full Name</label>
                                 <input
+                                    id="patient-name"
                                     type="text"
                                     value={form.name}
                                     onChange={(e) => updateField('name', e.target.value)}
@@ -180,8 +181,9 @@ export default function AdmitPatient() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-medium mb-1.5" style={labelStyle}>Age</label>
+                                <label htmlFor="patient-age" className="block text-xs font-medium mb-1.5" style={labelStyle}>Age</label>
                                 <input
+                                    id="patient-age"
                                     type="number"
                                     value={form.age}
                                     onChange={(e) => updateField('age', e.target.value)}
@@ -243,7 +245,9 @@ export default function AdmitPatient() {
 
                         {/* Custom symptom */}
                         <div className="flex gap-2">
+                            <label htmlFor="custom-symptom-input" className="sr-only">Add custom symptom</label>
                             <input
+                                id="custom-symptom-input"
                                 type="text"
                                 value={customSymptom}
                                 onChange={(e) => setCustomSymptom(e.target.value)}
@@ -270,8 +274,9 @@ export default function AdmitPatient() {
 
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                             <div>
-                                <label className="block text-xs font-medium mb-1.5" style={labelStyle}>Heart Rate (bpm)</label>
+                                <label htmlFor="vital-hr" className="block text-xs font-medium mb-1.5" style={labelStyle}>Heart Rate (bpm)</label>
                                 <input
+                                    id="vital-hr"
                                     type="number"
                                     value={form.vitals.heartRate}
                                     onChange={(e) => updateVital('heartRate', e.target.value)}
@@ -281,8 +286,9 @@ export default function AdmitPatient() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-medium mb-1.5" style={labelStyle}>Temperature (°F)</label>
+                                <label htmlFor="vital-temp" className="block text-xs font-medium mb-1.5" style={labelStyle}>Temperature (°F)</label>
                                 <input
+                                    id="vital-temp"
                                     type="number"
                                     step="0.1"
                                     value={form.vitals.temp}
@@ -293,8 +299,9 @@ export default function AdmitPatient() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-medium mb-1.5" style={labelStyle}>O₂ Saturation (%)</label>
+                                <label htmlFor="vital-o2" className="block text-xs font-medium mb-1.5" style={labelStyle}>O₂ Saturation (%)</label>
                                 <input
+                                    id="vital-o2"
                                     type="number"
                                     value={form.vitals.o2Sat}
                                     onChange={(e) => updateVital('o2Sat', e.target.value)}
@@ -304,8 +311,9 @@ export default function AdmitPatient() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-medium mb-1.5" style={labelStyle}>BP Systolic (mmHg)</label>
+                                <label htmlFor="vital-sys" className="block text-xs font-medium mb-1.5" style={labelStyle}>BP Systolic (mmHg)</label>
                                 <input
+                                    id="vital-sys"
                                     type="number"
                                     value={form.vitals.bpSystolic}
                                     onChange={(e) => updateVital('bpSystolic', e.target.value)}
@@ -315,8 +323,9 @@ export default function AdmitPatient() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-medium mb-1.5" style={labelStyle}>BP Diastolic (mmHg)</label>
+                                <label htmlFor="vital-dia" className="block text-xs font-medium mb-1.5" style={labelStyle}>BP Diastolic (mmHg)</label>
                                 <input
+                                    id="vital-dia"
                                     type="number"
                                     value={form.vitals.bpDiastolic}
                                     onChange={(e) => updateVital('bpDiastolic', e.target.value)}
