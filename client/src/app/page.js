@@ -109,7 +109,7 @@ export default function Home() {
             <div key={title}
               className="glass-panel p-8 rounded-2xl text-left transition-all duration-500 hover:-translate-y-2 group"
             >
-              <div className="text-xs font-mono mb-6 text-sky-500 font-bold tracking-widest">{tag} //</div>
+              <div className="text-xs font-mono mb-6 text-sky-500 font-bold tracking-widest">{tag} {/* // */}</div>
               <h3 className="text-lg font-bold mb-3 tracking-tight" style={{ color: 'var(--text-primary)' }}>{title}</h3>
               <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{desc}</p>
             </div>
