@@ -40,6 +40,13 @@ export default function NavBar() {
                             style={{ color: 'var(--text-primary)' }}>
                             Admit Patient
                         </Link>
+                        {['Admin', 'Doctor'].includes(user.role) && (
+                            <Link href="/reports"
+                                className="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 no-underline hover:bg-black/5 dark:hover:bg-white/5"
+                                style={{ color: 'var(--text-primary)' }}>
+                                Reports
+                            </Link>
+                        )}
                         <div className="flex items-center gap-3 ml-4 pl-4" style={{ borderLeft: '1px solid var(--border)' }}>
                             <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest"
                                 style={{ background: `${ROLE_COLORS[user.role] || '#6b7280'}15`, color: ROLE_COLORS[user.role] || '#6b7280', border: `1px solid ${ROLE_COLORS[user.role]}30` }}>

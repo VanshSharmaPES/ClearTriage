@@ -8,6 +8,7 @@ require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
 const patientRoutes = require('./routes/patients');
 const authRoutes = require('./routes/auth');
+const reportRoutes = require('./routes/reports');
 
 const { Server } = require('socket.io');
 const http = require('http');
@@ -44,6 +45,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/patients', patientRoutes);
+app.use('/api/reports', reportRoutes);
 
 // Socket.io connection logging
 io.on('connection', (socket) => {
