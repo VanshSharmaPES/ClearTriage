@@ -12,6 +12,7 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='repla
 # ── Config ──────────────────────────────────────────────
 DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
 RAW_PATH = os.path.join(DATA_DIR, 'data.csv')
+OVERRIDES_PATH = os.path.join(DATA_DIR, 'overrides.csv')
 CLEAN_PATH = os.path.join(DATA_DIR, 'cleaned_data.csv')
 SCALER_PATH = os.path.join(DATA_DIR, 'scaler.pkl')
 
@@ -37,22 +38,22 @@ def main():
 
     # ── 1. Load ──────────────────────────────────────────
     df = pd.read_csv(RAW_PATH, sep=';', encoding='latin-1')
-    print(f"✅ Loaded raw data: {df.shape[0]} rows, {df.shape[1]} columns")
+    print(f"✅ Loaded raw data: {df.shape[0]} rows, {df.shape[1]} columns")     
 
-    # ── 2. Drop leakage columns ──────────────────────────
+    if os.path.exists(OVERRIDES_PATH):
+        df_overrides = pd.read_csv(OVERRIDES_PATH)
+        df = pd.concat([df, df_overrides], ignore_index=True)
+        print(f"✅ Injected {df_overrides.shape[0]} override rows as ground truth")
     existing = [c for c in LEAKAGE_COLS if c in df.columns]
     df = df.drop(columns=existing)
     print(f"🗑  Dropped {len(existing)} leakage columns")
 
     # ── 3. Fix types ─────────────────────────────────────
-    # Pandas 3.x uses StringDtype ('str') not 'object' for text columns.
-    # Force all non-text feature columns to numeric.
     text_col = 'Chief_complain'
     for col in df.columns:
         if col == text_col or col == TARGET:
             continue
-        if pd.api.types.is_string_dtype(df[col]):
-            df[col] = df[col].astype(str).str.replace(',', '.', regex=False)
+        if pd.api.types.is_string_dtype(df[col]) or pd.api.types.is_object_dtype(df[col]):
             df[col] = pd.to_numeric(df[col], errors='coerce')
     print("🔧 Coerced all feature columns to numeric")
 
